@@ -188,9 +188,19 @@ section.tight{padding-top:36px}
 /* between phone and full desktop, keep the photo in its own half of the hero */
 @media (min-width:861px) and (max-width:1180px){.hero .photo img{right:-170px;height:82%}.hero h1{font-size:52px}}
 
-/* hero credentials under the buttons, stacked so they stay clear of the photo */
-.hero .creds{margin-top:30px;font-size:14px;color:var(--slate);max-width:400px;line-height:1.5;display:grid;gap:4px}
+/* hero credentials: under the buttons on desktop, after the photo on phones */
+.hero{grid-template-rows:1fr auto}
+.hero .copy{grid-column:1;grid-row:1;align-self:end;padding-bottom:0}
+.hero .photo{grid-column:2;grid-row:1 / span 2}
+.hero .creds{grid-column:1;grid-row:2;padding:30px 56px 56px;font-size:14px;color:var(--slate);max-width:480px;line-height:1.5;display:grid;gap:4px;position:relative;z-index:1}
 .hero .creds span{display:block;padding-left:14px;position:relative}
 .hero .creds span::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--coral)}
+@media (max-width:860px){.hero{grid-template-rows:auto}.hero .copy,.hero .photo,.hero .creds{grid-column:1;grid-row:auto}.hero .copy{padding-bottom:28px}.hero .creds{padding:22px 24px 30px;max-width:none}}
+
 /* phones: photo centered under the text */
 @media (max-width:860px){.hero .photo img{right:auto;left:50%;transform:translateX(-50%);height:100%}}
+
+/* PhD in the brand orange everywhere it appears */
+.phd{color:var(--coral)}
+.hero .creds b.phd{font-weight:inherit}
+footer a.logo{opacity:1}
