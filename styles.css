@@ -208,9 +208,9 @@ footer a.logo{opacity:1}
 /* press strip under the hero: official logos on the page background, not linked */
 .press{padding:40px 0 0;text-align:center}
 .press-label{font-family:Oswald,sans-serif;font-weight:600;color:var(--slate);font-size:15px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:22px}
-.press-logos{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:26px 24px}
+.press-logos{display:grid;grid-template-columns:repeat(4,1fr);justify-items:center;align-items:center;gap:34px 24px;max-width:1000px;margin:0 auto}
 .press-logos img{display:block;width:auto;height:26px}
-.press-logos .marketwatch{height:22px}.press-logos .newsweek{height:24px}.press-logos .pq{height:110px;margin:-38px -2px -40px;mix-blend-mode:multiply}
+.press-logos .marketwatch{height:22px}.press-logos .newsweek{height:24px}.press-logos .pq{height:75px;margin:-24px -10px;mix-blend-mode:multiply}.press-logos .pqu{height:110px;margin:-38px -2px -40px;mix-blend-mode:multiply}
 .press-logos .koreadaily{height:36px}.press-logos .futurity{height:28px}.press-logos .eix{height:32px}
-@media (max-width:1180px){.press-logos{justify-content:center;gap:24px 36px}}
-@media (max-width:560px){.press{padding-top:32px}.press-logos{gap:22px 28px}.press-logos img{height:21px}.press-logos .marketwatch{height:18px}.press-logos .newsweek{height:20px}.press-logos .pq{height:86px;margin:-30px -1px -31px}.press-logos .koreadaily{height:30px}.press-logos .futurity{height:23px}.press-logos .eix{height:27px}}
+@media (max-width:760px){.press-logos{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.press{padding-top:32px}.press-logos{gap:24px 16px}.press-logos img{height:21px}.press-logos .marketwatch{height:18px}.press-logos .newsweek{height:20px}.press-logos .pq{height:56px;margin:-18px -7px}.press-logos .pqu{height:86px;margin:-30px -1px -31px}.press-logos .koreadaily{height:30px}.press-logos .futurity{height:23px}.press-logos .eix{height:27px}}
