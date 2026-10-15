@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About | David Park PhD</title>
+<meta name="description" content="Evidence-based tools for starting a business. Episodes, free worksheets and the five MERIT questions from David Park PhD, professor of entrepreneurship at Syracuse University.">
+<meta property="og:title" content="David Park PhD | Evidence-Based Entrepreneurship">
+<meta property="og:description" content="Evidence-based tools for starting a business, with a free worksheet for every episode.">
+<meta property="og:image" content="https://www.davidparkphd.com/images/og-image.jpg">
+<meta property="og:url" content="https://www.davidparkphd.com/about.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout follows hubermanlab.com (hero card, resources, latest episodes, topics, book, about).
+   Look follows the YouTube branding (grid paper, navy ink, coral and teal, condensed type, highlighter, question boxes). */
+:root{--paper:#FAFAF7;--ink:#14233A;--slate:#4E5D70;--coral:#E0521F;--teal:#1F6F78;--navy:#0E1A2B;--line:#DCE5EB;--fine:#EDF1F4;--hi:#F59A6A}
+*{box-sizing:border-box}
+body{margin:0;overflow-x:hidden;background:var(--paper);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:17px;line-height:1.55}
+.grid{background-color:var(--paper);background-image:linear-gradient(var(--line) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--line) 1.5px,transparent 1.5px),linear-gradient(var(--fine) 1px,transparent 1px),linear-gradient(90deg,var(--fine) 1px,transparent 1px);background-size:80px 80px,80px 80px,16px 16px,16px 16px}
+h1,h2,h3,.cond{font-family:Oswald,"Avenir Next Condensed",sans-serif;font-weight:600;letter-spacing:.005em;margin:0}
+a{color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+/* top bar, like Huberman's announcement strip */
+.strip{background:var(--navy);color:#fff;text-align:center;font-size:14px;padding:9px 16px}
+.strip b{color:var(--hi)}
+/* nav */
+nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.logo{font-family:Oswald,sans-serif;font-weight:700;font-size:28px;text-decoration:none}
+.logo span{color:var(--coral)}
+.menu{display:flex;gap:26px;font-weight:700;font-size:15px}
+.menu a{text-decoration:none}
+/* hero card */
+.hero{border-radius:22px;overflow:hidden;position:relative;display:grid;grid-template-columns:1.1fr 1fr;min-height:520px;border:1px solid var(--line);box-shadow:0 18px 40px rgba(20,35,58,.08)}
+.hero .copy{padding:64px 56px;align-self:center;position:relative;z-index:1}
+.series{font-family:Oswald,sans-serif;font-weight:600;color:var(--slate);font-size:18px;margin-bottom:18px}
+.hero h1{font-size:68px;line-height:1.02;text-transform:uppercase}
+.hero h1 em{font-style:normal;color:var(--coral)}
+.hero p{font-size:19px;color:var(--slate);max-width:470px;margin:20px 0 28px}
+.btn{display:inline-block;font-family:Oswald,sans-serif;font-weight:600;font-size:18px;padding:13px 26px;border-radius:999px;text-decoration:none}
+.btn.coral{background:var(--coral);color:#fff}
+.btn.ghost{border:2px solid var(--ink);margin-left:10px}
+.boxes{display:flex;gap:10px;margin-top:34px}
+.boxes .idea{width:56px;height:64px;border-radius:10px;background:var(--teal)}
+.boxes .hard{width:290px;height:64px;border-radius:10px;background:var(--coral);display:flex;align-items:center;justify-content:space-evenly}
+.boxes .hard i{width:44px;height:44px;border-radius:8px;background:#fff;color:var(--coral);font:700 32px/44px Oswald,sans-serif;text-align:center;font-style:normal}
+.hero .photo{position:relative}
+.hero .photo::before{content:"";position:absolute;inset:8% 0 0 8%;background:radial-gradient(closest-side,rgba(255,255,255,.95),rgba(255,255,255,0))}
+.hero .photo img{position:absolute;right:-40px;bottom:0;height:100%;filter:drop-shadow(0 12px 22px rgba(20,35,58,.22))}
+/* section heads */
+section{padding:72px 0 0}
+.head{display:flex;align-items:end;justify-content:space-between;margin-bottom:26px}
+.head h2{font-size:40px}
+.head a{font-weight:700;color:var(--coral);text-decoration:none}
+/* the free resource, Huberman's newsletter and book cards */
+.offer{display:grid;grid-template-columns:320px 1fr;gap:44px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:22px;padding:40px}
+.offer img{width:100%;border-radius:8px;box-shadow:0 10px 30px rgba(20,35,58,.16);transform:rotate(-1.5deg)}
+.offer h2{font-size:42px;line-height:1.08}
+.mark{position:relative;white-space:nowrap;z-index:0}
+.mark::before{content:"";position:absolute;left:-4px;right:-6px;top:45%;height:48%;background:var(--hi);opacity:.55;border-radius:4px;z-index:-1;transform:rotate(-.6deg)}
+.offer p{color:var(--slate);margin:14px 0 22px;max-width:560px}
+.signup{display:flex;gap:10px;max-width:520px}
+.signup input{flex:1;font:inherit;padding:12px 16px;border:2px solid var(--line);border-radius:999px;background:var(--paper)}
+.fine{font-size:13px;color:var(--slate);margin-top:10px}
+/* episode cards */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+.card img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.card .ph{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font:600 22px Oswald,sans-serif;color:var(--slate)}
+.card .body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:8px;flex:1}
+.kicker{font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.06em}
+.card h3{font-size:24px;line-height:1.15}
+.card p{margin:0;color:var(--slate);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:8px}
+.chip{font-size:13px;font-weight:700;padding:5px 12px;border-radius:999px;background:#E7F0F1;color:var(--teal)}
+.chip.c{background:#FCE7DE;color:var(--coral)}
+/* topics */
+.topics{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.tbox{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px}
+.tbox h3{font-size:24px;margin-bottom:6px}
+.tbox p{margin:0 0 16px;color:var(--slate);font-size:15px}
+.merit{display:flex;gap:10px;flex-wrap:wrap}
+.merit span{display:flex;align-items:center;gap:10px;text-decoration:none;border:2px solid var(--line);border-radius:12px;padding:8px 14px;font-weight:700}
+.merit span b{font:700 26px Oswald,sans-serif;color:var(--coral)}
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.steps span{text-decoration:none;border:2px solid var(--line);border-radius:12px;padding:10px 14px;font-weight:700}
+.steps span small{display:block;font-weight:400;color:var(--slate);font-size:13px}
+/* about */
+.about{display:grid;grid-template-columns:380px 1fr;gap:48px;align-items:center}
+.about .portrait{border-radius:22px;aspect-ratio:4/5;overflow:hidden;position:relative;border:1px solid var(--line)}
+.about .portrait img{position:absolute;left:50%;bottom:0;height:100%;transform:translateX(-50%)}
+.about h2{font-size:40px;margin-bottom:12px}
+.about p{color:var(--slate)}
+.awards{list-style:none;padding:0;margin:18px 0 26px}
+.awards li{padding:10px 0;border-top:1px solid var(--line);font-weight:700}
+.awards li:last-child{border-bottom:1px solid var(--line)}
+.book{grid-template-columns:260px 1fr}
+.cover{aspect-ratio:2/3;border-radius:6px 14px 14px 6px;box-shadow:0 14px 30px rgba(20,35,58,.22),inset 6px 0 0 rgba(20,35,58,.12);transform:rotate(-1.5deg);position:relative;overflow:hidden}
+.cv{position:absolute;inset:0;padding:22px 18px;display:flex;flex-direction:column}
+.cvs{font:600 13px Oswald,sans-serif;color:var(--slate)}
+.cvt{font:700 40px/1 Oswald,sans-serif;text-transform:uppercase;margin-top:auto}
+.cvt em{font-style:normal;color:var(--coral)}
+.cvb{display:flex;gap:6px;margin:16px 0}
+.cvb span:first-child{width:22px;height:28px;border-radius:5px;background:var(--teal)}
+.cvb span:last-child{flex:1;height:28px;border-radius:5px;background:var(--coral);display:flex;align-items:center;justify-content:space-evenly}
+.cvb i{width:18px;height:18px;border-radius:4px;background:#fff;color:var(--coral);font:700 13px/18px Oswald,sans-serif;text-align:center;font-style:normal}
+.cva{font:700 18px Oswald,sans-serif}
+.cva b{color:var(--coral)}
+footer{margin-top:80px;background:var(--navy);color:#fff;padding:44px 0}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+footer .logo{color:#fff}
+footer a{text-decoration:none;opacity:.85;margin-left:22px}
+@media (max-width:860px){
+ .hero{grid-template-columns:1fr}.hero .copy{padding:40px 24px}.hero h1{font-size:46px}.hero .photo{height:380px}
+ .offer,.about,.topics,.book{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.steps{grid-template-columns:1fr}
+ nav{flex-wrap:wrap;gap:10px}.menu{gap:16px;font-size:14px;flex-wrap:wrap}
+ .hero>*,.offer>*,.about>*,.topics>*{min-width:0}.hero h1{font-size:40px}
+ .boxes .hard{width:auto;flex:1}.offer{padding:24px}.offer h2,.head h2,.about h2{font-size:32px}
+ .btn.ghost{margin:10px 0 0}.book .cover{max-width:240px}.about .portrait{max-width:380px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <nav>
+  <a class="logo" href="/">David Park <span>PhD</span></a>
+  <div class="menu"><a href="/#episodes">Episodes</a><a href="/#resources">Resources</a><a href="/#topics">Topics</a><a href="/#book">Book</a><a href="/#about">About</a></div>
+ </nav>
+ <section style="padding-top:24px">
+  <div class="about">
+   <div class="portrait grid"><img src="images/david-park-headshot.webp" alt="David Park"></div>
+   <div>
+    <div class="kicker">About</div>
+    <h1 style="font-size:52px;margin-bottom:14px">David Park PhD</h1>
+    <p>I am an Associate Professor of Entrepreneurship and an IES Faculty Fellow at the Whitman School of Management, Syracuse University.</p>
+    <p>As an interdisciplinary scholar in entrepreneurship, business strategy, and organizational studies, I study how for-profit businesses, nonprofits, and social enterprises mobilize resources to start, grow, and sustain over time. My work has been published in leading academic journals, including <em>Strategic Management Journal</em>, <em>Journal of Business Venturing</em>, and <em>Strategic Entrepreneurship Journal</em>.</p>
+    <p>I was honored by Poets&amp;Quants as one of the World's Best 40 Under 40 MBA Professors and one of the Top 50 Undergraduate Business Professors. I was also recognized as the SBA's Instructor of the Year.</p>
+    <p>When I'm not teaching or conducting research, I advise businesses and ventures and mentor entrepreneurs around the world.</p>
+    <p>Before earning my Ph.D. in Business Administration from the University of Washington, I co-founded a high-tech startup and served as a Marine Corps officer (Captain, Ret.).</p>
+    <p>Outside of work, I enjoy lifting heavy weights and practicing jiujitsu.</p>
+   </div>
+  </div>
+ </section>
+</div>
+
+<footer>
+ <div class="wrap">
+  <a class="logo" href="/">David Park <span style="color:var(--hi)">PhD</span></a>
+  <div><a href="https://www.linkedin.com/in/david-park-b43644123/">LinkedIn</a><a href="https://scholar.google.com/citations?user=uI05p0sAAAAJ&amp;hl=en&amp;oi=ao">Google Scholar</a><a href="https://whitman.syracuse.edu/faculty-and-research/faculty-staff-directory/details/udpark">Syracuse</a></div>
+ </div>
+</footer>
+</body>
+</html>
