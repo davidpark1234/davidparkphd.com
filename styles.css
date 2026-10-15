@@ -204,3 +204,13 @@ section.tight{padding-top:36px}
 .phd{color:var(--coral)}
 .hero .creds b.phd{font-weight:inherit}
 footer a.logo{opacity:1}
+
+/* press strip under the hero: official logos on the page background, not linked */
+.press{padding:40px 0 0;text-align:center}
+.press-label{font-family:Oswald,sans-serif;font-weight:600;color:var(--slate);font-size:15px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:22px}
+.press-logos{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:26px 24px}
+.press-logos img{display:block;width:auto;height:26px}
+.press-logos .marketwatch{height:22px}.press-logos .newsweek{height:24px}.press-logos .pq{height:27px}
+.press-logos .koreadaily{height:36px}.press-logos .futurity{height:28px}.press-logos .eix{height:32px}
+@media (max-width:1180px){.press-logos{justify-content:center;gap:24px 36px}}
+@media (max-width:560px){.press{padding-top:32px}.press-logos{gap:22px 28px}.press-logos img{height:21px}.press-logos .marketwatch{height:18px}.press-logos .newsweek,.press-logos .pq{height:20px}.press-logos .koreadaily{height:30px}.press-logos .futurity{height:23px}.press-logos .eix{height:27px}}
