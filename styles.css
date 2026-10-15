@@ -28,7 +28,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0
 .btn.ghost{border:2px solid var(--ink);margin-left:10px}
 .hero .photo{position:relative}
 .hero .photo::before{content:"";position:absolute;inset:8% 0 0 8%;background:radial-gradient(closest-side,rgba(255,255,255,.95),rgba(255,255,255,0))}
-.hero .photo img{position:absolute;right:-96px;bottom:0;height:100%;filter:drop-shadow(0 12px 22px rgba(20,35,58,.22))}
+.hero .photo img{position:absolute;right:-190px;bottom:0;height:94%;filter:drop-shadow(0 12px 22px rgba(20,35,58,.22))}
 /* section heads */
 section{padding:72px 0 0}
 .head{display:flex;align-items:end;justify-content:space-between;margin-bottom:26px}
@@ -180,10 +180,17 @@ section.tight{padding-top:36px}
 .social a{display:inline-flex;width:44px;height:44px;align-items:center;justify-content:center;border-radius:10px;transition:transform .15s}
 .social a:hover{transform:translateY(-2px)}
 .social a:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
-.social img{width:32px;height:32px;display:block}
+.social img{height:30px;width:auto;max-width:40px;display:block}
 .shortbio{margin-top:40px;padding:22px 26px;border:1px solid var(--line);border-radius:16px;background:#fff}
 .shortbio h2{font-size:24px;margin-bottom:8px}
 .shortbio p{color:var(--slate);margin:0}
 @media (prefers-reduced-motion: reduce){.social a{transition:none}}
 /* between phone and full desktop, keep the photo in its own half of the hero */
-@media (min-width:861px) and (max-width:1180px){.hero .photo img{right:-56px;height:86%}.hero h1{font-size:54px}}
+@media (min-width:861px) and (max-width:1180px){.hero .photo img{right:-170px;height:82%}.hero h1{font-size:52px}}
+
+/* hero credentials under the buttons, stacked so they stay clear of the photo */
+.hero .creds{margin-top:30px;font-size:14px;color:var(--slate);max-width:400px;line-height:1.5;display:grid;gap:4px}
+.hero .creds span{display:block;padding-left:14px;position:relative}
+.hero .creds span::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--coral)}
+/* phones: photo centered under the text */
+@media (max-width:860px){.hero .photo img{right:auto;left:50%;transform:translateX(-50%);height:100%}}
