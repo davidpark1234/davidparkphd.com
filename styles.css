@@ -159,3 +159,21 @@ section.tight{padding-top:36px}
  .part{padding:14px 16px}
  .player .soon{font-size:13px;padding:6px 12px;right:10px;bottom:10px}
 }
+
+/* email sign-up band, above the footer on every page */
+.join{margin-top:80px;padding:56px 0;background:#fff;border-top:1px solid var(--line)}
+.join+footer{margin-top:0}
+.join .wrap{display:grid;grid-template-columns:1fr minmax(0,460px);gap:16px 48px;align-items:center}
+.join h2{font-size:36px;line-height:1.1}
+.join p{color:var(--slate);margin:12px 0 0;max-width:560px}
+.join .signup{max-width:none}
+.join .signup .btn{border:0;cursor:pointer}
+.join .fine{grid-column:2}
+.join .fine a{color:var(--teal);font-weight:700}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:860px){
+ .join .wrap{grid-template-columns:1fr}
+ .join .fine{grid-column:1}
+ .join h2{font-size:30px}
+ .join .signup{flex-direction:column}
+}
