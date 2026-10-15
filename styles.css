@@ -214,3 +214,5 @@ footer a.logo{opacity:1}
 .press-logos .koreadaily{height:36px}.press-logos .futurity{height:28px}.press-logos .eix{height:32px}
 @media (max-width:760px){.press-logos{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.press{padding-top:32px}.press-logos{gap:24px 16px}.press-logos img{height:21px}.press-logos .marketwatch{height:18px}.press-logos .newsweek{height:20px}.press-logos .pq{height:56px;margin:-18px -7px}.press-logos .pqu{height:86px;margin:-30px -1px -31px}.press-logos .koreadaily{height:30px}.press-logos .futurity{height:23px}.press-logos .eix{height:27px}}
+.press-about{padding:52px 0 16px;margin-top:56px;border-top:1px solid var(--line)}
+@media (max-width:560px){.press-about{padding-top:48px;margin-top:40px}}
