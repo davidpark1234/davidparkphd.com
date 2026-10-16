@@ -14,6 +14,7 @@ import difflib
 import json
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -51,7 +52,17 @@ def is_short(vid):
 def main():
     dry = "--dry-run" in sys.argv
     ids = json.loads(IDS.read_text()) if IDS.exists() else {}
-    feed = ET.fromstring(urllib.request.urlopen(urllib.request.Request(FEED, headers={"User-Agent": "Mozilla/5.0"}), timeout=30).read())
+    feed = None
+    for attempt in range(3):  # YouTube's feed sometimes answers 404 or 5xx for a few minutes
+        try:
+            feed = ET.fromstring(urllib.request.urlopen(urllib.request.Request(FEED, headers={"User-Agent": "Mozilla/5.0"}), timeout=30).read())
+            break
+        except (urllib.error.URLError, ET.ParseError, TimeoutError) as e:
+            print(f"feed attempt {attempt + 1}: {e}")
+            time.sleep(20)
+    if feed is None:
+        print("::warning::YouTube feed unavailable, will try again on the next run")
+        return
     videos = [(e.findtext("yt:videoId", namespaces=NS), e.findtext("a:title", namespaces=NS) or "") for e in feed.findall("a:entry", NS)]
     open_eps = [(n, t) for n, t in episodes() if str(n) not in ids]
     known = set(ids.values())
