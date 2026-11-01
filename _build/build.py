@@ -81,7 +81,7 @@ NAV = [("Episodes", "/episodes/"), ("Resources", "/resources/"), ("Topics", "/#t
 FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">'
 FOOTER = """<footer>
  <div class="wrap">
-  <a class="logo" href="/">David Park <span>PhD</span></a>
+  <a class="logo" href="/"><img src="/images/logo-dark.png" width="400" height="44" alt="David Park PhD"></a>
  </div>
 </footer>"""
 e = html.escape
@@ -90,7 +90,7 @@ e = html.escape
 def nav(active=None):
     cur = ' aria-current="page"'
     links = "".join(f'<a href="{h}"{cur if t == active else ""}>{t}</a>' for t, h in NAV)
-    return f' <nav>\n  <a class="logo" href="/">David Park <span>PhD</span></a>\n  <div class="menu">{links}</div>\n </nav>'
+    return f' <nav>\n  <a class="logo" href="/"><img src="/images/logo.png" width="400" height="44" alt="David Park PhD"></a>\n  <div class="menu">{links}</div>\n </nav>'
 
 
 def signup():

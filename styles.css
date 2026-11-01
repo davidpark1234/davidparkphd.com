@@ -14,6 +14,9 @@ a{color:inherit}
 nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
 .logo{font-family:Oswald,sans-serif;font-weight:700;font-size:28px;text-decoration:none}
 .logo span{color:var(--coral)}
+.logo img{display:block;height:32px;width:auto}
+footer .logo img{height:28px}
+@media (max-width:860px){.logo img{height:26px}}
 .menu{display:flex;gap:26px;font-weight:700;font-size:15px}
 .menu a{text-decoration:none}
 /* hero card */
