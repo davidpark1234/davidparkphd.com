@@ -1,6 +1,6 @@
 /* Layout follows hubermanlab.com (hero card, resources, latest episodes, topics, book, about).
    Look follows the YouTube branding (grid paper, navy ink, coral and teal, condensed type, highlighter, question boxes). */
-:root{--paper:#FAFAF7;--ink:#14233A;--slate:#4E5D70;--coral:#E0521F;--teal:#1F6F78;--navy:#0E1A2B;--line:#DCE5EB;--fine:#EDF1F4;--hi:#F59A6A}
+:root{--paper:#FAFAF7;--ink:#1F3A63;--slate:#4E5D70;--coral:#F27A3D;--teal:#1F6F78;--navy:#1F3A63;--line:#DCE5EB;--fine:#EDF1F4;--hi:#F8B48E}
 *{box-sizing:border-box}
 body{margin:0;overflow-x:hidden;background:var(--paper);color:var(--ink);font-family:Nunito,system-ui,sans-serif;font-size:17px;line-height:1.55}
 .grid{background-color:var(--paper);background-image:linear-gradient(var(--line) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--line) 1.5px,transparent 1.5px),linear-gradient(var(--fine) 1px,transparent 1px),linear-gradient(90deg,var(--fine) 1px,transparent 1px);background-size:80px 80px,80px 80px,16px 16px,16px 16px}
@@ -16,6 +16,9 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0
 .logo span{color:var(--coral)}
 .logo img{display:block;height:32px;width:auto}
 footer .logo img{height:28px}
+.name{line-height:0}
+.name .name-logo{display:block;height:46px;width:auto;max-width:100%}
+@media (max-width:860px){.name .name-logo{height:34px}}
 @media (max-width:860px){.logo img{height:26px}}
 .menu{display:flex;gap:26px;font-weight:700;font-size:15px}
 .menu a{text-decoration:none}
@@ -27,7 +30,7 @@ footer .logo img{height:28px}
 .hero h1 em{font-style:normal;color:var(--coral)}
 .hero p{font-size:19px;color:var(--slate);max-width:480px;margin:22px 0 44px}
 .btn{display:inline-block;font-family:Oswald,sans-serif;font-weight:600;font-size:18px;padding:13px 26px;border-radius:999px;text-decoration:none}
-.btn.coral{background:var(--coral);color:#fff}
+.btn.coral{background:var(--coral);color:var(--navy)}
 .btn.ghost{border:2px solid var(--ink);margin-left:10px}
 .hero .photo{position:relative}
 .hero .photo::before{content:"";position:absolute;inset:8% 0 0 8%;background:radial-gradient(closest-side,rgba(255,255,255,.95),rgba(255,255,255,0))}
