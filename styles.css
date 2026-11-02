@@ -80,7 +80,7 @@ section{padding:72px 0 0}
 .about .portrait img{position:absolute;left:50%;bottom:0;height:100%;transform:translateX(-50%)}
 .about h2{font-size:40px;margin-bottom:12px}
 .about p{color:var(--slate)}
-.awards{list-style:none;padding:0;margin:18px 0 26px}
+.awards{list-style:none;padding:0;margin:18px 0 26px;text-align:center}
 .awards li{padding:10px 0;border-top:1px solid var(--line);font-weight:700}
 .awards li:last-child{border-bottom:1px solid var(--line)}
 .book{grid-template-columns:260px 1fr}
