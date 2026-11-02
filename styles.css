@@ -235,3 +235,7 @@ footer a.logo{opacity:1}
 .strip a{color:inherit;text-decoration:none}.strip a:hover b{text-decoration:underline}
 .about.solo{grid-template-columns:minmax(0,1fr);max-width:760px}
 .about.solo .social{margin:28px 0 0}
+
+.about-hero{margin:4px 0 44px;border-radius:22px;overflow:hidden;border:1px solid var(--line)}
+.about-hero img{display:block;width:100%;height:auto;aspect-ratio:2400/712;object-fit:cover;object-position:78% 50%}
+@media (max-width:560px){.about-hero{margin-bottom:28px}.about-hero img{aspect-ratio:3/2;object-position:100% 50%}}
