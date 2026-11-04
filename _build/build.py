@@ -55,8 +55,30 @@ EPISODES = [
                   ('Quibi, October 21, 2020, "An open letter from Quibi" (archived copy)', "http://web.archive.org/web/20201022230831/https://quibi-hq.medium.com/an-open-letter-from-quibi-8af6b415377f"),
                   ('NBC News, October 22, 2020, "A look at why Quibi failed so soon after launching" (subscriber figures as reported, and the Katzenberg quote)', "https://www.nbcnews.com/business/business-news/look-why-quibi-failed-so-soon-after-launching-n1244312")],
          note="Maya is an illustrative example."),
-    dict(n=2, slug=None, title="Where Do Good Opportunities Come From?", youtube=None, chips=["Market"],
-         card="Why some people spot opportunities everyone else misses, and where to look for your own."),
+    dict(n=2, slug="where-do-good-opportunities-come-from", title="Where Do Good Opportunities Come From?",
+         youtube=None, chips=["Market", "MERIT"],
+         card="Why some people spot opportunities everyone else misses, and where to look for your own.",
+         lede="Good opportunities rarely come from trying to think one up. Here's where they usually start, and how to tell whether one is any good.",
+         about=["Before Gymshark, Ben Francis tried apps and a website. What worked was a problem he had himself: he couldn't find gym clothes that fit, so he started sewing his own in his family's garage.",
+                "This episode shows where good opportunities usually start: a real problem people already pay for, wait for or work around, in a place you know better than most, at a moment when something has changed. It looks at research on user entrepreneurs, then introduces MERIT, the five questions this series uses to judge an idea, and runs the Gymshark garage through it."],
+         merit=[("M", "Market", "Who is the customer, how many are there, and will they pay?"),
+                ("E", "Edge", "Why you, and what stops others copying you once it works?"),
+                ("R", "Returns", "Does the price cover the cost, and is it worth it for you?"),
+                ("I", "Implementation", "Can you build it, reach the people who want it and deliver?"),
+                ("T", "Team", "Do you have the skills it takes, and who do you need to bring in?")],
+         chapters=[("0:00", "Two people, one question"), ("0:55", "Where Gymshark came from"), ("1:57", "How you know a problem is real"),
+                   ("2:24", "The person with the problem"), ("3:20", "From a fix to a business"), ("3:52", "What MERIT is"),
+                   ("4:55", "The garage, letter by letter"), ("5:57", "What happened next"), ("6:49", "Finding yours"), ("7:50", "Next time")],
+         worksheet="problem-journal-page",
+         sources_title="Sources",
+         sources=[("Shah, S. K., & Tripsas, M. (2007). The accidental entrepreneur: The emergent and collective process of user entrepreneurship. Strategic Entrepreneurship Journal, 1(1-2), 123-140", "https://doi.org/10.1002/sej.15"),
+                  ("Park, Rha, Shah and Chattopadhyay (2024), Industrial and Corporate Change, 33(1), 64-89", "https://doi.org/10.1093/icc/dtad072"),
+                  ('Gymshark, "The Official Gymshark Story" (the company\'s own account)', "https://www.gymshark.com/blog/article/the-official-gymshark-story"),
+                  ("Forbes Australia, April 7, 2023, on Ben Francis and Gymshark", "https://www.forbes.com.au/news/billionaires/forbes-rich-list-gymshark-founder-ben-francis-rise-to-success/"),
+                  ("Mark Sweney, The Guardian, July 3, 2026 (the 2020 valuation of 1.25 billion pounds)", "https://www.theguardian.com/business/2026/jul/03/gymshark-founder-ben-francis-stake-us-private-equity-firm")],
+         note="The nurse is an illustrative example. Money is given in US dollars, converted from pounds at about $1.50 to the pound."),
+    dict(n=3, slug=None, title="Who Should Be Your First Customer?", youtube=None, chips=["Market"],
+         card="Why the first customer you pick matters more than the size of the market, and how to choose the one to start with."),
 ]
 
 # YouTube ids, set by hand or by _build/youtube_sync.py when the episode goes public. Keys are episode numbers.
@@ -69,6 +91,10 @@ WORKSHEETS = {
     "what-has-to-be-true": dict(name="What Has to Be True? Worksheet", ep=1, pdf="what-has-to-be-true-worksheet.pdf",
                                 img="worksheet-01-preview.jpg",
                                 text="Write down what a business depends on, and see which parts you know and which you only believe. The five MERIT questions and the exercise from episode 1, on one page."),
+    "problem-journal-page": dict(name="Problem Journal Page", ep=2, pdf="problem-journal-page.pdf",
+                                 img="worksheet-02-preview.jpg",
+                                 panel="Five problems from a place you know, and the one MERIT question to answer next, on one page.",
+                                 text="Write down five problems people pay for, wait for or work around in a place you know, star your favorite, and note the one MERIT question you can't answer about it yet. From episode 2, on one page."),
 }
 
 # Kit (kit.com) form. Set form_id from the form's embed code (Kit > Grow > Landing pages and forms > the form > Embed > HTML).
@@ -239,7 +265,7 @@ def episode_page(ep, nxt):
     <img src="/images/{w["img"]}" alt="The {e(w["name"])}">
     <div class="kicker">Free worksheet</div>
     <h3>{e(w["name"])}</h3>
-    <p>The five questions and the exercise from this episode, on one page.</p>
+    <p>{e(w.get("panel", "The five questions and the exercise from this episode, on one page."))}</p>
     <a class="btn coral" href="/resources/{w["pdf"]}" download>Download (PDF)</a>
    </div>
    <div class="panel">
