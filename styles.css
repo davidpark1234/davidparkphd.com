@@ -354,3 +354,6 @@ footer a.logo{opacity:1}
  .course-hero .creds{max-width:560px}
 }
 @media (min-width:861px){.course-hero.on-home{min-height:420px}.course-hero.on-home .photo img{height:min(97%,600px);right:-110px}}
+.course-hero.on-courses .hh{font-size:56px}
+@media (min-width:861px) and (max-width:1180px){.course-hero.on-courses .hh{font-size:46px}}
+@media (max-width:860px){.course-hero.on-courses .hh{font-size:36px}}
