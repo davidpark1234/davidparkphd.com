@@ -102,7 +102,7 @@ SIGNUP = dict(form_id="10049880")
 SIGNUP_LIVE = bool(SIGNUP["form_id"])
 SIGNUP_SHOWN = SIGNUP_LIVE or os.environ.get("PREVIEW") == "1"
 
-NAV = [("Shows", "/shows/"), ("Courses", "/courses/"), ("Resources", "/resources/"), ("Book", "/#book"), ("About", "/about.html")]
+NAV = [("Shows", "/shows/"), ("Courses", "/courses/"), ("Resources", "/resources/"), ("Book", "/book/"), ("About", "/about.html")]
 FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,600;112,800&family=Oswald:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">'
 FOOTER = """<footer>
  <div class="wrap">
@@ -477,6 +477,43 @@ def course_hero(tag, where):
  </div>"""
 
 
+def book_page():
+    """The Merit Test, the book (BK-18: Amazon and the email list at launch; until then, coming soon)."""
+    merit = EPISODES[0]["merit"]
+    qs = "".join(f'<li><b>{l}</b><div><strong>{e(w)}</strong>{e(q)}</div></li>' for l, w, q in merit)
+    body = f""" <section class="pagehead">
+  <div class="offer book bookhead">
+   <img src="/images/the-merit-test-cover.webp?v=20261101" width="560" height="840" alt="Cover of The Merit Test by David Park PhD, an evidence-based startup guide. The word MERIT is spelled in five large tiles, with the R tile in coral and slightly askew.">
+   <div>
+    <div class="kicker">Book, coming soon</div>
+    <h1 class="ph1">The <span class="mark">Merit Test</span></h1>
+    <p class="lede">Five questions to answer before you bet your time and money on a business idea.</p>
+    <p><b>It isn't a test you pass. It's a test you put your idea through.</b></p>
+    <p class="soon-note">The book is coming soon. Sign up below to hear when it's out.</p>
+   </div>
+  </div>
+ </section>
+ <section class="tight">
+  <div class="topics">
+   <div class="tbox">
+    <h3>What's inside</h3>
+    <p>The Merit Test is the framework David Park developed and uses in his teaching. The book walks through it one question at a time, with the research behind each one and real companies that got it right or wrong.</p>
+    <ol class="qlist">{qs}</ol>
+   </div>
+   <div class="tbox">
+    <h3>Who it's for</h3>
+    <p>Anyone with a business idea who wants to find out, before betting too much on it, whether it's worth pursuing. You don't need a business background.</p>
+    <h3 style="margin-top:22px">Start free now</h3>
+    <p>The free course, Evidence-Based Entrepreneurship, covers the same questions in short episodes, each with a one-page worksheet.</p>
+    <p><a class="btn ghost" href="/courses/">See the course</a><a class="btn ghost" href="/resources/">Free worksheets</a></p>
+   </div>
+  </div>
+ </section>"""
+    return page("book/index.html", "The Merit Test | Book | David Park PhD",
+                "The Merit Test by David Park PhD: five questions to answer before you bet your time and money on a business idea. Coming soon.",
+                body, "Book", image="the-merit-test-cover.webp")
+
+
 def shows_index():
     blocks = []
     for s in SHOWS:
@@ -638,7 +675,7 @@ def signup_pages():
 
 
 def main():
-    urls = [BASE + "/", BASE + "/about.html", shows_index(), courses_index(), resources_index()]
+    urls = [BASE + "/", BASE + "/about.html", shows_index(), courses_index(), resources_index(), book_page()]
     urls += [show_episode_page(v) for v in VIDEOS]
     episodes_redirect()
     eps = [x for x in EPISODES]

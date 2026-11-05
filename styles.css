@@ -362,3 +362,12 @@ footer a.logo{opacity:1}
 .course-hero .hh .nw{white-space:nowrap}
 @media (min-width:861px){.course-hero.on-courses{grid-template-columns:1.6fr 1fr}.course-hero.on-courses .hh{font-size:52px}}
 @media (max-width:560px){.course-hero .hh .nw{white-space:normal}}
+/* Book page */
+.bookhead{grid-template-columns:240px 1fr}
+.bookhead img{max-width:240px;height:auto}
+.bookhead .ph1{margin:6px 0 0}
+.bookhead .lede{margin:12px 0 6px}
+.bookhead .soon-note{margin-top:14px}
+.tbox .qlist{margin-top:14px}
+.tbox .btn{margin:8px 10px 0 0}
+@media (max-width:860px){.bookhead{grid-template-columns:1fr}.bookhead img{max-width:200px}}
