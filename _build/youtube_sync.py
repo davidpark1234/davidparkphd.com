@@ -33,6 +33,10 @@ NS = {"a": "http://www.w3.org/2005/Atom", "yt": "http://www.youtube.com/xml/sche
 UA = {"User-Agent": "Mozilla/5.0", "Accept-Language": "en"}
 
 
+def slugify(t):
+    return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", t.lower())).strip("-")
+
+
 def norm(t):
     return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", t.lower())).strip()
 
@@ -139,7 +143,14 @@ def main():
         show = next((k for k, n in show_list if v["id"] in members.get(k, set())), None) \
             or next((k for k, n in show_list if n.lower() in text), None) or "other"
         print(f"{show}: {v['id']} {v['title']!r} ({v['published']})")
-        store["items"].append(dict(id=v["id"], title=v["title"], published=v["published"], show=show)); changed.append(show)
+        store["items"].append(dict(id=v["id"], title=v["title"], published=v["published"], show=show,
+                                   slug=slugify(v["title"]), description=v["description"])); changed.append(show)
+    by_id = {v["id"]: v for v in feed}
+    for it in store["items"]:                      # keep each page in step with its YouTube description and title
+        f = by_id.get(it["id"])
+        if f and (it.get("description") != f["description"] or it["title"] != f["title"]):
+            it["description"], it["title"] = f["description"], f["title"]; changed.append("updated " + it["id"])
+        it.setdefault("slug", slugify(it["title"]))  # the address stays the same even if the title changes later
     if changed and not dry:
         IDS.write_text(json.dumps(dict(sorted(ids.items(), key=lambda x: int(x[0]))), indent=1) + "\n")
         store["items"].sort(key=lambda x: x["published"], reverse=True)

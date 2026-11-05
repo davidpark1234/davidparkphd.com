@@ -152,7 +152,7 @@ def page(path, title, desc, body, active=None, image="og-image.jpg"):
 <meta name="description" content="{e(desc)}">
 <meta property="og:title" content="{e(title)}">
 <meta property="og:description" content="{e(desc)}">
-<meta property="og:image" content="{BASE}/images/{image}">
+<meta property="og:image" content="{image if image.startswith("http") else BASE + "/images/" + image}">
 <meta property="og:url" content="{url}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="{url}">
@@ -340,8 +340,81 @@ def when(v):
     return f"{MONTHS[int(m) - 1]} {y}" if y and m else ""
 
 
+def video_href(v):
+    return f"/episodes/{v.get('slug') or re.sub('[^a-z0-9]+', '-', v['title'].lower()).strip('-')}.html"
+
+
+def linkify(text):
+    out, last = [], 0
+    for m in re.finditer(r"https?://[^\s<>()]+[^\s<>().,;]", text):
+        out.append(e(text[last:m.start()])); u = m.group(0)
+        out.append(f'<a href="{e(u)}">{e(u.split("//", 1)[1].split("/")[0].replace("www.", ""))}</a>'); last = m.end()
+    return "".join(out) + e(text[last:])
+
+
+SOCIAL_LINE = re.compile(r"^(instagram|youtube|website|linkedin|tiktok|x|twitter)\b.*https?://", re.I)
+
+
+def show_episode_page(v):
+    """A page for one show episode, built from its YouTube description: summary, chapters, sources and notes."""
+    show = next((s for s in SHOWS if s["key"] == v["show"]), None)
+    name = show["name"] if show else "Video"
+    blocks = [bl.strip() for bl in re.split(r"\n\s*\n", v.get("description", "")) if bl.strip()]
+    about, notes, chapters, sources, seen_chapters = [], [], [], [], False
+    for bl in blocks:
+        lines = [l.strip() for l in bl.split("\n") if l.strip()]
+        head = lines[0].rstrip(":").lower()
+        if head == "chapters":
+            seen_chapters = True
+            for l in lines[1:]:
+                m = re.match(r"(\d+(?::\d+)+)\s+(.*)", l)
+                if m:
+                    secs = sum(int(x) * 60 ** i for i, x in enumerate(reversed(m.group(1).split(":"))))
+                    chapters.append(f'<li><a href="https://www.youtube.com/watch?v={v["id"]}&amp;t={secs}s"><time>{m.group(1)}</time>{e(m.group(2))}</a></li>')
+        elif head in ("sources", "references"):
+            sources += [f"<li>{linkify(l)}</li>" for l in lines[1:]]
+        elif all(SOCIAL_LINE.match(l) for l in lines) or all(l.startswith("#") for l in lines):
+            continue                                    # account links and hashtags stay on YouTube
+        else:
+            (notes if seen_chapters else about).append("<p>" + "<br>".join(linkify(l) for l in lines) + "</p>")
+    player = f'<iframe src="https://www.youtube-nocookie.com/embed/{v["id"]}" title="{e(v["title"])}" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>'
+    sec = lambda title, inner: f"<h2>{title}</h2>{inner}" if inner else ""
+    others = [x for x in show_videos(v["show"]) if x["id"] != v["id"]][:3]
+    more = "".join(f'<li><a href="{video_href(x)}">{e(x["title"])}</a></li>' for x in others)
+    body = f""" <section class="pagehead">
+  <div class="crumb"><a href="/shows/">Shows</a> / <a href="/shows/#{v["show"]}">{e(name)}</a></div>
+  <div class="kicker">{e(name)} · {when(v)}</div>
+  <h1 class="ph1">{e(v["title"])}</h1>
+ </section>
+
+ <div class="ep">
+  <div>
+   <div class="player">{player}</div>
+   <div class="prose">
+    {sec("About this episode", "".join(about))}
+    {sec("Chapters", '<ol class="chapters">' + "".join(chapters) + "</ol>" if chapters else "")}
+    {sec("Sources", '<ul class="sources">' + "".join(sources) + "</ul>" if sources else "")}
+    {"".join(n.replace("<p>", '<p class="note">', 1) for n in notes)}
+   </div>
+  </div>
+  <aside class="side">
+   <div class="panel">
+    {show_cover(show) if show else ""}
+    <div class="kicker">Show</div>
+    <h3>{e(name)}</h3>
+    <p>{e(show["line"]) if show else ""}</p>
+    <a class="btn coral" href="https://www.youtube.com/watch?v={v["id"]}" target="_blank" rel="noopener">Watch on YouTube</a>
+   </div>
+   {f'<div class="panel"><div class="kicker">More from {e(name)}</div><ul class="morelist">{more}</ul></div>' if more else ""}
+  </aside>
+ </div>"""
+    desc = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", about[0]))[:200] if about else v["title"]
+    return page(video_href(v).lstrip("/"), f"{v['title']} | {name} | David Park PhD", desc, body, "Shows",
+                image=f"https://i.ytimg.com/vi/{v['id']}/hqdefault.jpg")
+
+
 def video_card(v, label):
-    return f"""   <a class="card" href="https://www.youtube.com/watch?v={v["id"]}" target="_blank" rel="noopener">
+    return f"""   <a class="card" href="{video_href(v)}">
     <img src="https://i.ytimg.com/vi/{v["id"]}/hqdefault.jpg" alt="" loading="lazy">
     <div class="body">
      <div class="kicker">{e(label)} · {when(v)}</div>
@@ -355,7 +428,7 @@ def home_show_cards():
     for s in SHOWS:
         vids = show_videos(s["key"])
         chip = (f'<span class="chip c">New: {e(vids[0]["title"])}</span>' if vids else '<span class="chip">First episodes coming soon</span>')
-        out.append(f"""   <a class="card showcard" href="/shows/#{s["key"]}">
+        out.append(f"""   <a class="card showcard" href="{video_href(vids[0]) if vids else "/shows/#" + s["key"]}">
     {show_cover(s)}
     <div class="body">
      <div class="kicker">Show</div>
@@ -386,7 +459,7 @@ def shows_index():
     for s in SHOWS:
         fm = "".join(f"<li>{e(f)}</li>" for f in s["formats"])
         vids = show_videos(s["key"])
-        status = (f'<a class="btn coral" href="https://www.youtube.com/watch?v={vids[0]["id"]}" target="_blank" rel="noopener">Watch the latest episode</a>' if vids
+        status = (f'<a class="btn coral" href="{video_href(vids[0])}">Watch the latest episode</a>' if vids
                   else '<p class="soon-note">The first episodes are coming soon. Sign up below to hear when they are out.</p>')
         grid = (f'\n  <div class="cards showeps">\n' + "\n".join(video_card(v, s["name"]) for v in vids) + "\n  </div>") if vids else ""
         blocks.append(f""" <section class="tight show" id="{s["key"]}">
@@ -488,7 +561,7 @@ def home_latest():
     show_strip = None
     if fresh:
         v = fresh[0]; name = next(s["name"] for s in SHOWS if s["key"] == v["show"])
-        show_strip = f'<div class="strip">New on {e(name)}. <a href="https://www.youtube.com/watch?v={v["id"]}"><b>{e(v["title"])}</b></a> Watch it now.</div>'
+        show_strip = f'<div class="strip">New on {e(name)}. <a href="{video_href(v)}"><b>{e(v["title"])}</b></a> Watch it now.</div>'
     if COURSE_SOON:
         return (show_strip or '<div class="strip">Coming soon. <b>The Merit Test</b>, a free course in 20 short episodes, each with a free worksheet.</div>',
                 "<!-- latest -->\n" + course_card(True) + "\n   <!-- /latest -->")
@@ -551,6 +624,7 @@ def signup_pages():
 
 def main():
     urls = [BASE + "/", BASE + "/about.html", shows_index(), courses_index(), resources_index()]
+    urls += [show_episode_page(v) for v in VIDEOS]
     episodes_redirect()
     eps = [x for x in EPISODES]
     for i, ep in enumerate(eps):

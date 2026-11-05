@@ -278,3 +278,7 @@ footer a.logo{opacity:1}
 .coursecard.wide .mcover{border-bottom:0;border-right:1px solid var(--line);height:100%}
 @media (max-width:860px){.coursecard.wide{grid-template-columns:1fr}.coursecard.wide .mcover{border-right:0;border-bottom:1px solid var(--line)}}
 .showeps{margin-top:28px}
+/* show episode pages */
+.side .scover{border-radius:12px;margin-bottom:14px}
+.side .scover .sl1{font-size:26px}.side .scover .sl2{font-size:13px}
+.morelist{margin:8px 0 0;padding-left:18px;display:grid;gap:6px}
