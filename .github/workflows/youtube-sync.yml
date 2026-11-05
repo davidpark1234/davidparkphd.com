@@ -1,6 +1,6 @@
-# When a new episode goes public on YouTube, put it on the website.
-# Every 15 minutes: read the channel's public feed (_build/youtube_sync.py), and if a full video matches a planned
-# episode title, record its id, rebuild the pages (_build/build.py), commit and publish. Shorts and other videos are skipped.
+# When a new video goes public on the David Park PhD channel, put it on the website.
+# Every 15 minutes (GitHub often runs it later): read the channel's public feed (_build/youtube_sync.py), sort each new full
+# video into The Merit Test, a show or More videos, rebuild the pages (_build/build.py), commit and publish. Shorts are skipped.
 name: YouTube to website
 on:
   schedule:
@@ -24,11 +24,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if git diff --quiet -- _build/youtube.json; then echo "No new episode"; exit 0; fi
+          if git diff --quiet -- _build/youtube.json _build/videos.json; then echo "No new video"; exit 0; fi
           python3 -I _build/build.py
           git config user.name "YouTube to website"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "New episode on YouTube: website updated automatically"
+          git commit -m "New video on YouTube: website updated automatically"
           git push
           gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Pages build request skipped, the push will publish"

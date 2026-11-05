@@ -277,3 +277,4 @@ footer a.logo{opacity:1}
 .coursecard.wide{display:grid;grid-template-columns:minmax(0,460px) minmax(0,1fr);align-items:center}
 .coursecard.wide .mcover{border-bottom:0;border-right:1px solid var(--line);height:100%}
 @media (max-width:860px){.coursecard.wide{grid-template-columns:1fr}.coursecard.wide .mcover{border-right:0;border-bottom:1px solid var(--line)}}
+.showeps{margin-top:28px}

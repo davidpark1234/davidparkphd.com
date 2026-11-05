@@ -302,9 +302,14 @@ def episodes_index():
     return page("episodes/index.html", "Episodes | David Park PhD", "All episodes of the Evidence-Based Entrepreneurship series from David Park PhD, with a free worksheet for each.", body, "Episodes")
 
 
-# The Merit Test course stays "coming soon" until the whole series is uploaded (WD-61). Set to False on launch day:
-# the homepage banner, the course page and the homepage course row then show the episodes again.
-COURSE_SOON = True
+# The Merit Test course stays "coming soon" until episode 1 is public on the David Park PhD channel (WD-61): youtube_sync.py
+# then records its id and the banner, the course page and the homepage course row switch to the episodes by themselves.
+COURSE_SOON = not _YT.get("1")
+
+# Show episodes and other full videos from the channel, written by youtube_sync.py (newest first).
+_VID = json.loads((SITE / "_build" / "videos.json").read_text()) if (SITE / "_build" / "videos.json").exists() else {}
+VIDEOS = _VID.get("items", [])
+MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
 # Shows (WD-55, WD-59, WD-62, WD-63). Add a show here when it launches; "first" stays None until its first episode is out.
 SHOWS = [
@@ -326,12 +331,64 @@ def merit_cover():
     return f'<div class="mcover"><div class="the">THE</div><div class="mtiles">{tiles}</div><div class="the">TEST</div></div>'
 
 
+def show_videos(key):
+    return [v for v in VIDEOS if v["show"] == key]
+
+
+def when(v):
+    y, m = v["published"][:4], v["published"][5:7]
+    return f"{MONTHS[int(m) - 1]} {y}" if y and m else ""
+
+
+def video_card(v, label):
+    return f"""   <a class="card" href="https://www.youtube.com/watch?v={v["id"]}" target="_blank" rel="noopener">
+    <img src="https://i.ytimg.com/vi/{v["id"]}/hqdefault.jpg" alt="" loading="lazy">
+    <div class="body">
+     <div class="kicker">{e(label)} · {when(v)}</div>
+     <h3>{e(v["title"])}</h3>
+    </div>
+   </a>"""
+
+
+def home_show_cards():
+    out = []
+    for s in SHOWS:
+        vids = show_videos(s["key"])
+        chip = (f'<span class="chip c">New: {e(vids[0]["title"])}</span>' if vids else '<span class="chip">First episodes coming soon</span>')
+        out.append(f"""   <a class="card showcard" href="/shows/#{s["key"]}">
+    {show_cover(s)}
+    <div class="body">
+     <div class="kicker">Show</div>
+     <h3>{e(s["name"])}</h3>
+     <p>{e(s["line"])}</p>
+     <div class="chips">{chip}</div>
+    </div>
+   </a>""")
+    return "<!-- shows -->\n" + "\n".join(out) + "\n   <!-- /shows -->"
+
+
+def course_card(wide):
+    chips = ('<span class="chip c">Coming soon</span><span class="chip">20 episodes</span><span class="chip">Free worksheets</span>' if COURSE_SOON
+             else '<span class="chip c">MERIT</span><span class="chip">Free worksheets</span>')
+    return f"""   <a class="card coursecard{" wide" if wide else ""}" href="/courses/">
+    {merit_cover()}
+    <div class="body">
+     <div class="kicker">Free course</div>
+     <h3>The Merit Test</h3>
+     <p>You have a business idea. Is it worth pursuing? Short episodes in order, each with a one-page worksheet.</p>
+     <div class="chips">{chips}</div>
+    </div>
+   </a>"""
+
+
 def shows_index():
     blocks = []
     for s in SHOWS:
         fm = "".join(f"<li>{e(f)}</li>" for f in s["formats"])
-        status = (f'<a class="btn coral" href="{s["first"]}">Watch the first episode</a>' if s["first"]
+        vids = show_videos(s["key"])
+        status = (f'<a class="btn coral" href="https://www.youtube.com/watch?v={vids[0]["id"]}" target="_blank" rel="noopener">Watch the latest episode</a>' if vids
                   else '<p class="soon-note">The first episodes are coming soon. Sign up below to hear when they are out.</p>')
+        grid = (f'\n  <div class="cards showeps">\n' + "\n".join(video_card(v, s["name"]) for v in vids) + "\n  </div>") if vids else ""
         blocks.append(f""" <section class="tight show" id="{s["key"]}">
   <div class="showrow">
    {show_cover(s)}
@@ -343,7 +400,7 @@ def shows_index():
     <ul class="formats">{fm}</ul>
     {status}
    </div>
-  </div>
+  </div>{grid}
  </section>""")
     body = """ <section class="pagehead">
   <div class="kicker">Shows</div>
@@ -351,6 +408,9 @@ def shows_index():
   <p class="lede">Short shows on business, each one checked against the research.</p>
  </section>
 """ + "\n".join(blocks)
+    other = show_videos("other")
+    if other:
+        body += '\n <section class="tight show" id="more">\n  <div class="head"><h2>More videos</h2></div>\n  <div class="cards">\n' + "\n".join(video_card(v, "Video") for v in other) + "\n  </div>\n </section>"
     return page("shows/index.html", "Shows | David Park PhD", "Business Now and Business Story with David Park PhD: business news and company stories, checked against the research.", body, "Shows")
 
 
@@ -423,15 +483,21 @@ def resources_index():
 
 def home_latest():
     """The homepage banner and its two episode cards: the newest episode that is out (or episode 1) and the one after it."""
+    from datetime import date as _d
+    fresh = [v for v in VIDEOS if v["show"] != "other" and v["published"] and (_d.today() - _d.fromisoformat(v["published"])).days <= 14]
+    show_strip = None
+    if fresh:
+        v = fresh[0]; name = next(s["name"] for s in SHOWS if s["key"] == v["show"])
+        show_strip = f'<div class="strip">New on {e(name)}. <a href="https://www.youtube.com/watch?v={v["id"]}"><b>{e(v["title"])}</b></a> Watch it now.</div>'
     if COURSE_SOON:
-        return ('<div class="strip">Coming soon. <b>The Merit Test</b>, a free course in 20 short episodes, each with a free worksheet.</div>',
-                "<!-- latest -->\n   <!-- /latest -->")
+        return (show_strip or '<div class="strip">Coming soon. <b>The Merit Test</b>, a free course in 20 short episodes, each with a free worksheet.</div>',
+                "<!-- latest -->\n" + course_card(True) + "\n   <!-- /latest -->")
     out = [x for x in EPISODES if x["youtube"] and ep_href(x)]
     latest = out[-1] if out else EPISODES[0]
     i = EPISODES.index(latest)
-    cards = "\n".join(card(x) for x in EPISODES[i:i + 2])
+    cards = course_card(False) + "\n" + "\n".join(card(x) for x in EPISODES[i:i + 2])
     if out:
-        strip = f'<div class="strip">New episode. <a href="{ep_href(latest)}"><b>{e(latest["title"])}</b></a> Watch it now, with its free worksheet.</div>'
+        strip = show_strip or f'<div class="strip">New episode. <a href="{ep_href(latest)}"><b>{e(latest["title"])}</b></a> Watch it now, with its free worksheet.</div>'
     else:
         strip = '<div class="strip">New free course. <b>The Merit Test</b>. Episode 1 is coming soon, and its free worksheet is ready now.</div>'
     return strip, "<!-- latest -->\n" + cards + "\n   <!-- /latest -->"
@@ -450,6 +516,7 @@ def sync_shared(path, active=None):
         strip, latest = home_latest()
         s = re.sub(r'<div class="strip">.*?</div>', lambda m: strip, s, count=1, flags=re.S)
         s = re.sub(r"<!-- latest -->.*?<!-- /latest -->", lambda m: latest, s, count=1, flags=re.S)
+        s = re.sub(r"<!-- shows -->.*?<!-- /shows -->", lambda m: home_show_cards(), s, count=1, flags=re.S)
     p.write_text(s)
 
 

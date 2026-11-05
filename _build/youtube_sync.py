@@ -1,14 +1,18 @@
-"""Find newly public episodes on the YouTube channel and record their video ids for the website.
+"""Put new videos from the David Park PhD YouTube channel on the website.
 
-Reads the channel's public feed (no key needed), matches each full video to an episode in build.py by its title,
-and writes the id to _build/youtube.json. Shorts, other videos (such as the Korean series) and episodes that
-already have an id are left alone. Prints what it found. Exit code 0 always, so a quiet run is not an error.
+Reads the channel's public feed (no key needed) and sorts every new full video (Shorts are skipped):
+  1. a Merit Test episode, matched by its title to build.py's EPISODES, goes into _build/youtube.json;
+  2. a show episode goes into _build/videos.json under its show, found by the show's YouTube playlist
+     ("Business Now", "Business Story", the names in build.py's SHOWS) or by the show name in the title or description;
+  3. any other full video goes into _build/videos.json as "other" (More videos on the Shows page).
+A video that mentions The Merit Test but matches no planned title is left out, so it never lands in a show by mistake.
+Prints what it found. Exit code 0 always, so a quiet run is not an error.
 
 Usage
-    python3 _build/youtube_sync.py            update youtube.json
+    python3 _build/youtube_sync.py            update youtube.json and videos.json
     python3 _build/youtube_sync.py --dry-run  only print what it would do
 
-Run by .github/workflows/youtube-sync.yml every 15 minutes, which then runs build.py and publishes.
+Run by .github/workflows/youtube-sync.yml every 15 minutes (GitHub often runs it later), which then runs build.py and publishes.
 """
 import difflib
 import json
@@ -21,10 +25,12 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 CHANNEL_ID = "UC-N6X4gJtGrTDSAuOea8nEA"  # David Park PhD, the English channel (@DavidPark_PhD until the handle switch, WD-60)
-FEED = f"https://www.youtube.com/feeds/videos.xml?channel_id={CHANNEL_ID}"
+FEED = "https://www.youtube.com/feeds/videos.xml?channel_id=" + CHANNEL_ID
 HERE = Path(__file__).resolve().parent
 IDS = HERE / "youtube.json"
-NS = {"a": "http://www.w3.org/2005/Atom", "yt": "http://www.youtube.com/xml/schemas/2015"}
+VIDEOS = HERE / "videos.json"
+NS = {"a": "http://www.w3.org/2005/Atom", "yt": "http://www.youtube.com/xml/schemas/2015", "m": "http://search.yahoo.com/mrss/"}
+UA = {"User-Agent": "Mozilla/5.0", "Accept-Language": "en"}
 
 
 def norm(t):
@@ -32,9 +38,50 @@ def norm(t):
 
 
 def episodes():
-    """Episode numbers and titles straight from build.py's EPISODES list, without running the build."""
+    """Merit Test episode numbers and titles straight from build.py's EPISODES list, without running the build."""
     src = (HERE / "build.py").read_text()
     return [(int(n), t) for n, t in re.findall(r'dict\(n=(\d+),.*?title="([^"]+)"', src, re.S)]
+
+
+def shows():
+    """(key, name) of each show in build.py's SHOWS."""
+    return re.findall(r'dict\(key="(\w+)", tag="\w+", name="([^"]+)"', (HERE / "build.py").read_text())
+
+
+def fetch(url, tries=3):
+    for attempt in range(tries):  # YouTube sometimes answers 404 or 5xx for a few minutes
+        try:
+            return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30).read()
+        except (urllib.error.URLError, TimeoutError) as e:
+            print(f"fetch attempt {attempt + 1} {url}: {e}")
+            time.sleep(15)
+    return None
+
+
+def entries(xml_bytes):
+    root = ET.fromstring(xml_bytes)
+    out = []
+    for e in root.findall("a:entry", NS):
+        out.append(dict(id=e.findtext("yt:videoId", namespaces=NS), title=e.findtext("a:title", namespaces=NS) or "",
+                        published=(e.findtext("a:published", namespaces=NS) or "")[:10],
+                        description=e.findtext("m:group/m:description", namespaces=NS) or ""))
+    return out
+
+
+def find_playlists(names):
+    """Playlist ids by name, read from the channel's playlists page (best effort; a playlist id set by hand always wins)."""
+    page = fetch(f"https://www.youtube.com/channel/{CHANNEL_ID}/playlists?hl=en", tries=1)
+    if not page:
+        return {}
+    html = page.decode("utf8", "ignore")
+    ids = [(m.start(), m.group(1)) for m in re.finditer(r'"(?:playlistId|contentId)":"(PL[\w-]{10,})"', html)]
+    found = {}
+    for name in names:
+        spots = [m.start() for m in re.finditer(re.escape(json.dumps(name)), html)]
+        best = min(((abs(s - p), pid) for s in spots for p, pid in ids), default=None)
+        if best and best[0] < 4000:
+            found[name] = best[1]
+    return found
 
 
 def is_short(vid):
@@ -44,49 +91,60 @@ def is_short(vid):
             return None
     opener = urllib.request.build_opener(NoRedirect)
     try:
-        return opener.open(urllib.request.Request(f"https://www.youtube.com/shorts/{vid}", headers={"User-Agent": "Mozilla/5.0"}), timeout=20).status == 200
+        return opener.open(urllib.request.Request(f"https://www.youtube.com/shorts/{vid}", headers=UA), timeout=20).status == 200
     except urllib.error.HTTPError as e:
         return False if 300 <= e.code < 400 else True  # on an unexpected error, treat it as a Short and skip it
+    except (urllib.error.URLError, TimeoutError):
+        return True
 
 
 def main():
     dry = "--dry-run" in sys.argv
     ids = json.loads(IDS.read_text()) if IDS.exists() else {}
-    feed = None
-    for attempt in range(3):  # YouTube's feed sometimes answers 404 or 5xx for a few minutes
-        try:
-            feed = ET.fromstring(urllib.request.urlopen(urllib.request.Request(FEED, headers={"User-Agent": "Mozilla/5.0"}), timeout=30).read())
-            break
-        except (urllib.error.URLError, ET.ParseError, TimeoutError) as e:
-            print(f"feed attempt {attempt + 1}: {e}")
-            time.sleep(20)
-    if feed is None:
+    store = json.loads(VIDEOS.read_text()) if VIDEOS.exists() else {}
+    store.setdefault("items", []); store.setdefault("playlists", {}); store.setdefault("shorts", [])
+    raw = fetch(FEED)
+    if raw is None:
         print("::warning::YouTube feed unavailable, will try again on the next run")
         return
-    videos = [(e.findtext("yt:videoId", namespaces=NS), e.findtext("a:title", namespaces=NS) or "") for e in feed.findall("a:entry", NS)]
+    feed = entries(raw)
+    known = set(ids.values()) | {v["id"] for v in store["items"]} | set(store["shorts"])
+    new = [v for v in feed if v["id"] and v["id"] not in known]
+    show_list = shows()
+    if new:
+        missing = [n for k, n in show_list if k not in store["playlists"]]
+        for name, pid in find_playlists(missing).items():
+            key = next(k for k, n in show_list if n == name); store["playlists"][key] = pid
+            print(f"playlist {name}: {pid}")
+    members = {}
+    for key, pid in store["playlists"].items():
+        pl = fetch("https://www.youtube.com/feeds/videos.xml?playlist_id=" + pid, tries=1) if new else None
+        members[key] = {v["id"] for v in entries(pl)} if pl else set()
     open_eps = [(n, t) for n, t in episodes() if str(n) not in ids]
-    known = set(ids.values())
     changed = []
-    for vid, title in videos:
-        if vid in known:
+    for v in new:
+        if is_short(v["id"]):
+            print(f"skip Short {v['id']} {v['title']!r}"); store["shorts"] = (store["shorts"] + [v["id"]])[-300:]; changed.append("short")
             continue
-        best = max(open_eps, key=lambda x: difflib.SequenceMatcher(None, norm(x[1]), norm(title)).ratio(), default=None)
-        if not best:
-            break
-        score = difflib.SequenceMatcher(None, norm(best[1]), norm(title)).ratio()
-        if score < 0.9:
+        best = max(open_eps, key=lambda x: difflib.SequenceMatcher(None, norm(x[1]), norm(v["title"])).ratio(), default=None)
+        score = difflib.SequenceMatcher(None, norm(best[1]), norm(v["title"])).ratio() if best else 0
+        if score >= 0.9:
+            print(f"Merit Test episode {best[0]}: {v['id']} {v['title']!r} (title match {score:.2f})")
+            ids[str(best[0])] = v["id"]; open_eps.remove(best); changed.append(f"ep{best[0]}")
             continue
-        if is_short(vid):
-            print(f"skip Short {vid} {title!r}")
+        text = (v["title"] + " " + v["description"]).lower()
+        if "merit test" in text and not any(n.lower() in text for k, n in show_list):
+            print(f"::warning::{v['id']} {v['title']!r} mentions The Merit Test but matches no planned title; add it to EPISODES in build.py")
             continue
-        print(f"episode {best[0]}: {vid} {title!r} (title match {score:.2f})")
-        ids[str(best[0])] = vid
-        known.add(vid)
-        open_eps.remove(best)
-        changed.append(best[0])
+        show = next((k for k, n in show_list if v["id"] in members.get(k, set())), None) \
+            or next((k for k, n in show_list if n.lower() in text), None) or "other"
+        print(f"{show}: {v['id']} {v['title']!r} ({v['published']})")
+        store["items"].append(dict(id=v["id"], title=v["title"], published=v["published"], show=show)); changed.append(show)
     if changed and not dry:
         IDS.write_text(json.dumps(dict(sorted(ids.items(), key=lambda x: int(x[0]))), indent=1) + "\n")
-    print(f"{len(videos)} videos in the feed, new episodes: {changed or 'none'}{' (dry run)' if dry else ''}")
+        store["items"].sort(key=lambda x: x["published"], reverse=True)
+        VIDEOS.write_text(json.dumps(store, indent=1, ensure_ascii=False) + "\n")
+    print(f"{len(feed)} videos in the feed, new: {changed or 'none'}{' (dry run)' if dry else ''}")
 
 
 if __name__ == "__main__":
