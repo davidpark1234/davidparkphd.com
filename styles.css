@@ -308,3 +308,16 @@ footer a.logo{opacity:1}
 .side .scover,.card .side .scover{border:0;aspect-ratio:auto;padding:4px 0 14px;background:transparent}
 .side .scover img{max-width:240px}
 .side .scover img,.panel .scover img{box-shadow:none;border-radius:0;transform:none;margin:0 auto}
+/* course card = the original grid-paper hero (h2 on the homepage, h1 on the Courses page) */
+.hero h2.hh{font-size:68px;line-height:1.02;text-transform:uppercase}
+.hero .hh em{font-style:normal;color:var(--coral)}
+.course-hero .soon-note{margin:-24px 0 22px}
+.course-latest{margin-top:24px}
+.pagehead.tight-top{padding-top:24px}
+.showcard .body h3 a{text-decoration:none}
+.latest-ep{margin:12px 0 0;padding-top:12px;border-top:1px solid var(--line);font-size:15px}
+.latest-ep span{display:block;font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.06em}
+.latest-ep a{font-weight:700;color:var(--navy)}
+@media (min-width:861px) and (max-width:1180px){.hero h2.hh{font-size:52px}}
+@media (max-width:860px){.hero h2.hh{font-size:40px}}
+@media (min-width:861px){.course-hero .photo img{height:min(94%,720px)}.course-hero .creds{max-width:440px}}

@@ -238,7 +238,7 @@ def episode_page(ep, nxt):
     nhref = ep_href(nxt) if nxt else None
     ntitle = f'<a href="{nhref}">{e(nxt["title"])}</a>' if nhref else e(nxt["title"])
     body = f""" <section class="pagehead">
-  <div class="crumb"><a href="/courses/">The Merit Test</a> / Part {k}. {e(PARTS[k - 1][0])}</div>
+  <div class="crumb"><a href="/courses/">Evidence-Based Entrepreneurship</a> / Part {k}. {e(PARTS[k - 1][0])}</div>
   <div class="kicker">Episode {ep["n"]}</div>
   <h1 class="ph1">{e(ep["title"])}</h1>
   <p class="lede">{e(ep["lede"])}</p>
@@ -426,29 +426,18 @@ def home_show_cards():
     out = []
     for s in SHOWS:
         vids = show_videos(s["key"])
-        chip = (f'<span class="chip c">{len(vids)} episode{"s" if len(vids) != 1 else ""}</span>' if vids else '<span class="chip">First episodes coming soon</span>')
-        out.append(f"""   <a class="card showcard" href="/shows/#{s["key"]}">
-    {show_cover(s)}
+        latest = (f'<p class="latest-ep"><span>Latest episode</span><a href="{video_href(vids[0])}">{e(vids[0]["title"])}</a></p>' if vids
+                  else '<div class="chips"><span class="chip">First episodes coming soon</span></div>')
+        out.append(f"""   <div class="card showcard">
+    <a href="/shows/#{s["key"]}" aria-label="{e(s["name"])}">{show_cover(s)}</a>
     <div class="body">
      <div class="kicker">Show</div>
-     <h3>{e(s["name"])}</h3>
+     <h3><a href="/shows/#{s["key"]}">{e(s["name"])}</a></h3>
      <p>{e(s["line"])}</p>
-     <div class="chips">{chip}</div>
+     {latest}
     </div>
-   </a>""")
-    latest = next((v for v in VIDEOS if v["show"] != "other"), None)
-    if latest:
-        name = next(s["name"] for s in SHOWS if s["key"] == latest["show"])
-        out.append(f"""   <a class="card latestcard" href="{video_href(latest)}">
-    <img src="https://i.ytimg.com/vi/{latest["id"]}/hqdefault.jpg" alt="" loading="lazy">
-    <div class="body">
-     <div class="kicker">Latest episode · {e(name)}</div>
-     <h3>{e(latest["title"])}</h3>
-     <div class="chips"><span class="chip c">{when(latest)}</span></div>
-    </div>
-   </a>""")
+   </div>""")
     return "<!-- shows -->\n" + "\n".join(out) + "\n   <!-- /shows -->"
-
 
 def course_card(wide):
     chips = ('<span class="chip c">Coming soon</span><span class="chip">20 episodes</span><span class="chip">Free worksheets</span>' if COURSE_SOON
@@ -462,6 +451,28 @@ def course_card(wide):
      <div class="chips">{chips}</div>
     </div>
    </a>"""
+
+
+def course_hero(tag, where):
+    """The course card: David's original grid-paper hero, with his photo and credentials (as on the site before WD-63)."""
+    first = next((x for x in EPISODES if ep_href(x)), EPISODES[0])
+    label = "Evidence-Based Entrepreneurship · Free course" + (", coming soon" if COURSE_SOON else "")
+    if COURSE_SOON:
+        btns = ('<a class="btn coral" href="/courses/">About the course</a>' if where == "home" else "") + '<a class="btn ghost" href="/resources/">Free worksheets</a>'
+        soon = '<p class="soon-note">The course starts soon. Sign up below to hear when episode 1 is out.</p>' if where == "courses" else ""
+    else:
+        btns = f'<a class="btn coral" href="{ep_href(first)}">Start with episode 1</a><a class="btn ghost" href="/resources/">Free worksheets</a>'
+        soon = ""
+    return f""" <div class="hero grid course-hero">
+  <div class="copy">
+   <div class="series">{label}</div>
+   <{tag} class="hh">Evidence-based tools for <em>starting a business.</em></{tag}>
+   <p>Before you bet your savings or your career on a business idea, find out what has to be true for it to work. Short episodes built on research, and a free worksheet to test your own idea.</p>
+   {soon}{btns}
+  </div>
+  <div class="photo"><img src="/images/david-park-headshot.webp" alt="David Park"></div>
+  <div class="creds"><span>David Park <b class="phd">PhD</b>, professor of entrepreneurship at Syracuse University</span><span>Poets&amp;Quants Best 40 Under 40 MBA Professor</span><span>Poets&amp;Quants Top 50 Undergrad Business Professor</span><span>SBA Instructor of the Year</span></div>
+ </div>"""
 
 
 def shows_index():
@@ -504,21 +515,15 @@ def courses_index():
         parts.append(f'<div class="part"><b>{i}</b><div><h3>{e(name)}</h3><small>{rng}. {status}</small></div></div>')
     merit = "".join(f"<span><b>{l}</b>{w}</span>" for l, w in [("M", "Market"), ("E", "Edge"), ("R", "Returns"), ("I", "Implementation"), ("T", "Team")])
     first = next((x for x in EPISODES if ep_href(x)), EPISODES[0])
-    body = f""" <section class="pagehead course-head">
-  {merit_cover()}
-  <div>
-   <div class="kicker">Free course · {"coming soon" if COURSE_SOON else "20 episodes"}</div>
-   <h1 class="ph1">The Merit Test</h1>
-   <p class="lede">You have a business idea. Is it worth pursuing? Twenty short episodes, watched in order, each with a one-page worksheet for your own idea.</p>
-   {'<p class="soon-note">The course is coming soon. Sign up below to hear when it starts.</p>' if COURSE_SOON else f'<a class="btn coral" href="{ep_href(first)}">Start with episode 1</a>'}
-  </div>
+    body = f""" <section class="pagehead tight-top">
+{course_hero("h1", "courses")}
  </section>
  {"" if COURSE_SOON else chr(10).join([' <section class="tight">', '  <div class="cards">', chr(10).join(card(x) for x in EPISODES), '  </div>', ' </section>'])}
  <section>
   <div class="topics">
    <div class="tbox">
-    <h3>The five MERIT questions</h3>
-    <p>Five plain questions to ask about any business.</p>
+    <h3>The Merit Test</h3>
+    <p>The framework David Park developed and uses throughout the course: five plain questions to ask about any business.</p>
     <div class="merit">{merit}</div>
    </div>
    <div class="tbox">
@@ -528,8 +533,8 @@ def courses_index():
    </div>
   </div>
  </section>"""
-    return page("courses/index.html", "The Merit Test | Free course | David Park PhD",
-                ("Coming soon. " if COURSE_SOON else "") + "The Merit Test, a free course from David Park PhD: 20 short episodes on whether a business idea is worth pursuing, with a free worksheet for each.", body, "Courses")
+    return page("courses/index.html", "Evidence-Based Entrepreneurship | Free course | David Park PhD",
+                ("Coming soon. " if COURSE_SOON else "") + "Evidence-Based Entrepreneurship, a free course from David Park PhD: 20 short episodes on whether a business idea is worth pursuing, built on his Merit Test framework, with a free worksheet for each.", body, "Courses")
 
 
 def episodes_redirect():
@@ -558,7 +563,7 @@ def resources_index():
    <p>A new worksheet comes with each episode, and short guides for hands-on steps will follow. New ones appear here first.</p>
   </div>
  </section>"""
-    return page("resources/index.html", "Resources | David Park PhD", "Free one-page worksheets for The Merit Test, the free course from David Park PhD.", body, "Resources")
+    return page("resources/index.html", "Resources | David Park PhD", "Free one-page worksheets for Evidence-Based Entrepreneurship, the free course from David Park PhD.", body, "Resources")
 
 
 
@@ -571,16 +576,16 @@ def home_latest():
         v = fresh[0]; name = next(s["name"] for s in SHOWS if s["key"] == v["show"])
         show_strip = f'<div class="strip">New on {e(name)}. <a href="{video_href(v)}"><b>{e(v["title"])}</b></a> Watch it now.</div>'
     if COURSE_SOON:
-        return (show_strip or '<div class="strip">Coming soon. <b>The Merit Test</b>, a free course in 20 short episodes, each with a free worksheet.</div>',
-                "<!-- latest -->\n" + course_card(True) + "\n   <!-- /latest -->")
+        return (show_strip or '<div class="strip">Coming soon. <b>Evidence-Based Entrepreneurship</b>, a free course in 20 short episodes, each with a free worksheet.</div>',
+                "<!-- latest -->\n" + course_hero("h2", "home") + "\n   <!-- /latest -->")
     out = [x for x in EPISODES if x["youtube"] and ep_href(x)]
     latest = out[-1] if out else EPISODES[0]
     i = EPISODES.index(latest)
-    cards = course_card(False) + "\n" + "\n".join(card(x) for x in EPISODES[i:i + 2])
+    cards = course_hero("h2", "home") + '\n  <div class="cards course-latest">\n' + "\n".join(card(x) for x in EPISODES[i:i + 2]) + "\n  </div>"
     if out:
         strip = show_strip or f'<div class="strip">New episode. <a href="{ep_href(latest)}"><b>{e(latest["title"])}</b></a> Watch it now, with its free worksheet.</div>'
     else:
-        strip = '<div class="strip">New free course. <b>The Merit Test</b>. Episode 1 is coming soon, and its free worksheet is ready now.</div>'
+        strip = '<div class="strip">New free course. <b>Evidence-Based Entrepreneurship</b>. Episode 1 is coming soon, and its free worksheet is ready now.</div>'
     return strip, "<!-- latest -->\n" + cards + "\n   <!-- /latest -->"
 
 
