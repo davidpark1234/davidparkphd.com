@@ -321,3 +321,18 @@ footer a.logo{opacity:1}
 @media (min-width:861px) and (max-width:1180px){.hero h2.hh{font-size:52px}}
 @media (max-width:860px){.hero h2.hh{font-size:40px}}
 @media (min-width:861px){.course-hero .photo img{height:min(94%,720px)}.course-hero .creds{max-width:440px}}
+/* 2026-11-05: shorter show logo boxes, one-line latest episode, smaller course card and photo */
+.cards.two .scover{aspect-ratio:auto;height:150px}
+.cards.two .scover img{max-width:300px}
+.latest-ep{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.latest-ep span{display:inline;font-size:inherit;text-transform:none;letter-spacing:0;color:var(--teal);margin-right:6px}
+.latest-ep span::after{content:":"}
+.course-hero{min-height:0}
+.course-hero .copy{padding:44px 48px 0}
+.course-hero .hh,.hero h2.hh.hh{font-size:50px}
+.course-hero p{font-size:17px;margin:16px 0 28px}
+.course-hero .creds{padding:22px 48px 40px}
+@media (min-width:861px){.course-hero .photo img,.course-hero .photo img.x{height:min(84%,520px);right:-150px}}
+@media (min-width:861px) and (max-width:1180px){.course-hero .hh,.hero h2.hh.hh{font-size:42px}}
+@media (max-width:860px){.cards.two .scover{height:120px}.course-hero .copy{padding:32px 24px 0}.course-hero .hh,.hero h2.hh.hh{font-size:34px}.course-hero .photo{height:300px}.latest-ep{white-space:normal}}
+.course-hero .soon-note{margin:-10px 0 20px}
