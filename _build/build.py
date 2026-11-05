@@ -314,16 +314,15 @@ MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 # Shows (WD-55, WD-59, WD-62, WD-63). Add a show here when it launches; "first" stays None until its first episode is out.
 SHOWS = [
     dict(key="now", tag="NOW", name="Business Now", line="Business news, checked against the evidence.",
-         about="Layoffs, IPOs, a brand's collapse or comeback, the debate everyone is having. Each episode takes one story in the news, looks at what the research says, and ends with what it means for founders.",
-         formats=["Debates, 8 to 12 minutes, with both sides and a verdict", "Breakdowns, 5 to 8 minutes, one story and the lesson", "Now in 60, a one-minute take on a headline"], first=None),
+         about="One story in the news, what the research says about it, and what it means for founders.", first=None),
     dict(key="story", tag="STORY", name="Business Story", line="One company's story, and the research that explains it.",
-         about="Each episode tells one well-known company's story in about 10 to 15 minutes, then shows why it worked or failed with peer-reviewed research, and ends with a lesson founders can use.",
-         formats=["Episodes, 10 to 15 minutes", "A 60-second Short for each story"], first=None),
+         about="A well-known company, why it worked or failed, and the lesson founders can use.", first=None),
 ]
 
 
 def show_cover(s):
-    return f"""<div class="scover"><div class="sl1">Business <span class="spill">{s["tag"]}</span></div><div class="sl2">with <img src="/images/logo-dark.png" width="400" height="44" alt="David Park PhD"></div></div>"""
+    # the approved stacked lockup, as in the videos (WD-59; Business Story's is provisional, WD-62)
+    return f"""<div class="scover"><img src="/images/shows/business-{s["key"]}-lockup.png" alt="{e(s["name"])} with David Park PhD"></div>"""
 
 
 def merit_cover():
@@ -427,14 +426,25 @@ def home_show_cards():
     out = []
     for s in SHOWS:
         vids = show_videos(s["key"])
-        chip = (f'<span class="chip c">New: {e(vids[0]["title"])}</span>' if vids else '<span class="chip">First episodes coming soon</span>')
-        out.append(f"""   <a class="card showcard" href="{video_href(vids[0]) if vids else "/shows/#" + s["key"]}">
+        chip = (f'<span class="chip c">{len(vids)} episode{"s" if len(vids) != 1 else ""}</span>' if vids else '<span class="chip">First episodes coming soon</span>')
+        out.append(f"""   <a class="card showcard" href="/shows/#{s["key"]}">
     {show_cover(s)}
     <div class="body">
      <div class="kicker">Show</div>
      <h3>{e(s["name"])}</h3>
      <p>{e(s["line"])}</p>
      <div class="chips">{chip}</div>
+    </div>
+   </a>""")
+    latest = next((v for v in VIDEOS if v["show"] != "other"), None)
+    if latest:
+        name = next(s["name"] for s in SHOWS if s["key"] == latest["show"])
+        out.append(f"""   <a class="card latestcard" href="{video_href(latest)}">
+    <img src="https://i.ytimg.com/vi/{latest["id"]}/hqdefault.jpg" alt="" loading="lazy">
+    <div class="body">
+     <div class="kicker">Latest episode · {e(name)}</div>
+     <h3>{e(latest["title"])}</h3>
+     <div class="chips"><span class="chip c">{when(latest)}</span></div>
     </div>
    </a>""")
     return "<!-- shows -->\n" + "\n".join(out) + "\n   <!-- /shows -->"
@@ -457,7 +467,6 @@ def course_card(wide):
 def shows_index():
     blocks = []
     for s in SHOWS:
-        fm = "".join(f"<li>{e(f)}</li>" for f in s["formats"])
         vids = show_videos(s["key"])
         status = (f'<a class="btn coral" href="{video_href(vids[0])}">Watch the latest episode</a>' if vids
                   else '<p class="soon-note">The first episodes are coming soon. Sign up below to hear when they are out.</p>')
@@ -467,10 +476,9 @@ def shows_index():
    {show_cover(s)}
    <div>
     <div class="kicker">Show</div>
-    <h2>{e(s["name"])} <span class="with">with David Park PhD</span></h2>
+    <h2>{e(s["name"])}</h2>
     <p class="lede">{e(s["line"])}</p>
     <p>{e(s["about"])}</p>
-    <ul class="formats">{fm}</ul>
     {status}
    </div>
   </div>{grid}

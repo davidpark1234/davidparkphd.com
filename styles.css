@@ -282,3 +282,29 @@ footer a.logo{opacity:1}
 .side .scover{border-radius:12px;margin-bottom:14px}
 .side .scover .sl1{font-size:26px}.side .scover .sl2{font-size:13px}
 .morelist{margin:8px 0 0;padding-left:18px;display:grid;gap:6px}
+/* homepage Shows row: two small show cards and the latest episode */
+.showrow3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.showrow3 .scover .sl1{font-size:clamp(20px,2.3vw,30px);gap:8px}
+.showrow3 .scover .sl2{font-size:clamp(11px,1.15vw,14px)}
+.showrow3 .scover{gap:8px}
+.showrow3 .body h3{font-size:22px}
+.showrow3 .body p{font-size:15px;margin:4px 0 0}
+.latestcard{border-color:var(--coral)}
+/* Shows page, compact */
+.show .showrow{grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:28px;align-items:center}
+.show .showrow .scover .sl1{font-size:28px}.show .showrow .scover .sl2{font-size:13px}
+.show h2{font-size:30px}
+.show .lede{font-size:18px;margin:8px 0 0}
+.show p{margin:6px 0 0}
+.show .btn,.show .soon-note{margin-top:14px;display:inline-block}
+.show .showeps{margin-top:22px}
+@media (max-width:860px){.showrow3{grid-template-columns:1fr}.show .showrow{grid-template-columns:1fr}}
+/* show covers: the approved lockup image on white, as in the videos */
+.scover,.card .scover{background:#fff;border-bottom:1px solid var(--line);color:var(--navy);padding:0 10%}
+.scover img,.card .scover img,.card img.lk{width:100%;max-width:420px;height:auto;aspect-ratio:auto;object-fit:contain;display:block}
+.showrow .scover,.side .scover,.show .showrow .scover{border:1px solid var(--line)}
+.showrow3 .scover img{max-width:300px}
+.side .scover{aspect-ratio:16/9;padding:0 12%}
+.side .scover,.card .side .scover{border:0;aspect-ratio:auto;padding:4px 0 14px;background:transparent}
+.side .scover img{max-width:240px}
+.side .scover img,.panel .scover img{box-shadow:none;border-radius:0;transform:none;margin:0 auto}
