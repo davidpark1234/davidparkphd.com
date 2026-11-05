@@ -345,3 +345,12 @@ footer a.logo{opacity:1}
 .course-hero.on-courses .creds{padding:18px 40px 30px;font-size:13px}
 @media (min-width:861px){.course-hero.on-courses .photo img{height:min(80%,420px);right:-110px}}
 @media (max-width:860px){.course-hero.on-courses .hh{font-size:32px}.course-hero.on-courses .photo{height:260px}}
+/* course card: wider text column, slightly bigger photo (2026-11-05) */
+@media (min-width:861px){
+ .course-hero{grid-template-columns:1.45fr 1fr}
+ .course-hero .copy p{max-width:640px}
+ .course-hero.on-home .photo img{height:min(94%,580px);right:-120px}
+ .course-hero.on-courses .photo img{height:min(88%,470px);right:-90px}
+ .course-hero .creds{max-width:560px}
+}
+@media (min-width:861px){.course-hero.on-home{min-height:420px}.course-hero.on-home .photo img{height:min(97%,600px);right:-110px}}
