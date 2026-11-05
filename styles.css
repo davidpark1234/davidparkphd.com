@@ -336,3 +336,12 @@ footer a.logo{opacity:1}
 @media (min-width:861px) and (max-width:1180px){.course-hero .hh,.hero h2.hh.hh{font-size:42px}}
 @media (max-width:860px){.cards.two .scover{height:120px}.course-hero .copy{padding:32px 24px 0}.course-hero .hh,.hero h2.hh.hh{font-size:34px}.course-hero .photo{height:300px}.latest-ep{white-space:normal}}
 .course-hero .soon-note{margin:-10px 0 20px}
+/* homepage course card without credentials; Courses page card smaller, with credentials */
+.course-hero.on-home .copy{padding-bottom:44px;align-self:center}
+.course-hero.on-home .photo{grid-row:1}
+.course-hero.on-courses .copy{padding:32px 40px 0}
+.course-hero.on-courses .hh{font-size:40px}
+.course-hero.on-courses p{font-size:16px;margin:12px 0 22px}
+.course-hero.on-courses .creds{padding:18px 40px 30px;font-size:13px}
+@media (min-width:861px){.course-hero.on-courses .photo img{height:min(80%,420px);right:-110px}}
+@media (max-width:860px){.course-hero.on-courses .hh{font-size:32px}.course-hero.on-courses .photo{height:260px}}

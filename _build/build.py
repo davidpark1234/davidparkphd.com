@@ -463,7 +463,9 @@ def course_hero(tag, where):
     else:
         btns = f'<a class="btn coral" href="{ep_href(first)}">Start with episode 1</a><a class="btn ghost" href="/resources/">Free worksheets</a>'
         soon = ""
-    return f""" <div class="hero grid course-hero">
+    creds = ('<div class="creds"><span>David Park <b class="phd">PhD</b>, professor of entrepreneurship at Syracuse University</span><span>Poets&amp;Quants Best 40 Under 40 MBA Professor</span><span>Poets&amp;Quants Top 50 Undergrad Business Professor</span><span>SBA Instructor of the Year</span></div>'
+             if where == "courses" else "")   # the homepage card leaves out the name and awards (David, 2026-11-05)
+    return f""" <div class="hero grid course-hero on-{where}">
   <div class="copy">
    <div class="series">{label}</div>
    <{tag} class="hh">Evidence-based tools for <em>starting a business.</em></{tag}>
@@ -471,7 +473,7 @@ def course_hero(tag, where):
    {soon}{btns}
   </div>
   <div class="photo"><img src="/images/david-park-headshot.webp" alt="David Park"></div>
-  <div class="creds"><span>David Park <b class="phd">PhD</b>, professor of entrepreneurship at Syracuse University</span><span>Poets&amp;Quants Best 40 Under 40 MBA Professor</span><span>Poets&amp;Quants Top 50 Undergrad Business Professor</span><span>SBA Instructor of the Year</span></div>
+  {creds}
  </div>"""
 
 
