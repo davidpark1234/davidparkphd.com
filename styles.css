@@ -240,3 +240,35 @@ footer a.logo{opacity:1}
 .about-hero img{display:block;width:100%;height:auto;aspect-ratio:2400/712;object-fit:cover;object-position:78% 50%}
 @media (max-width:560px){.about-hero{margin-bottom:28px}.about-hero img{aspect-ratio:3/2;object-position:100% 50%}}
 .about.solo .name .name-logo{height:18px}
+/* WD-63 homepage, Shows and Courses (design D: show covers under the tagline, plain labels) */
+.intro2{padding:34px 0 6px}
+.intro2 h1{font-size:clamp(34px,4.6vw,54px);line-height:1.05;text-wrap:balance}
+.intro2 p{margin:10px 0 0;color:var(--slate);max-width:62ch}
+#shows.tight{padding-top:34px}
+.cards.two{grid-template-columns:repeat(2,1fr)}
+.scover{aspect-ratio:16/9;background:var(--navy);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.scover .sl1{display:flex;align-items:center;gap:12px;font:800 clamp(28px,3.4vw,42px)/1 Archivo,"Helvetica Neue",Arial,sans-serif;font-stretch:112%;letter-spacing:-.02em}
+.scover .spill{background:var(--coral);color:#fff;padding:3px 12px 4px;border-radius:4px}
+.scover .sl2{display:flex;align-items:center;gap:8px;font:600 clamp(15px,1.6vw,19px) Archivo,"Helvetica Neue",Arial,sans-serif;font-stretch:112%}
+.scover .sl2 img,.card .scover .sl2 img{height:1.05em;width:auto;aspect-ratio:auto;object-fit:contain;display:inline-block}
+.mcover{aspect-ratio:16/9;background:#fff;border-bottom:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.mcover .the{font:800 18px Archivo,"Helvetica Neue",Arial,sans-serif;font-stretch:112%;color:var(--navy);letter-spacing:.08em}
+.mtiles{display:flex;gap:8px}
+.mtiles b{width:48px;height:48px;border-radius:8px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font:800 30px Archivo,"Helvetica Neue",Arial,sans-serif;font-stretch:112%}
+.mtiles b.o{background:var(--coral)}
+.showrow{display:grid;grid-template-columns:minmax(0,460px) minmax(0,1fr);gap:36px;align-items:start}
+.showrow .scover{border-radius:18px}
+.show h2 .with{display:block;font-size:.5em;color:var(--slate);margin-top:6px}
+.show .lede{margin:12px 0 0}
+.formats{margin:14px 0 18px;padding-left:20px;display:grid;gap:4px}
+.soon-note{font-weight:700;color:var(--teal)}
+.show + .show{border-top:1px solid var(--line)}
+.course-head{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:36px;align-items:center}
+.course-head .mcover{border:1px solid var(--line);border-radius:18px}
+.course-head .btn{margin-top:18px}
+.tbox .parts{margin-top:14px}
+@media (max-width:860px){
+ .cards.two{grid-template-columns:1fr}
+ .showrow,.course-head{grid-template-columns:1fr;gap:20px}
+ .mtiles b{width:38px;height:38px;font-size:24px}
+}

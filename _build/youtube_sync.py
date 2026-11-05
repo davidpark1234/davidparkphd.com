@@ -20,7 +20,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-CHANNEL_ID = "UCZlZS_ah1zGoWDMqqwSMScg"  # youtube.com/@davidparkphd
+CHANNEL_ID = "UC-N6X4gJtGrTDSAuOea8nEA"  # David Park PhD, the English channel (@DavidPark_PhD until the handle switch, WD-60)
 FEED = f"https://www.youtube.com/feeds/videos.xml?channel_id={CHANNEL_ID}"
 HERE = Path(__file__).resolve().parent
 IDS = HERE / "youtube.json"

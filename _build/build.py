@@ -102,8 +102,8 @@ SIGNUP = dict(form_id="10049880")
 SIGNUP_LIVE = bool(SIGNUP["form_id"])
 SIGNUP_SHOWN = SIGNUP_LIVE or os.environ.get("PREVIEW") == "1"
 
-NAV = [("Episodes", "/episodes/"), ("Resources", "/resources/"), ("Topics", "/#topics"), ("Book", "/#book"), ("About", "/about.html")]
-FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">'
+NAV = [("Shows", "/shows/"), ("Courses", "/courses/"), ("Resources", "/resources/"), ("Book", "/#book"), ("About", "/about.html")]
+FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,600;112,800&family=Oswald:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">'
 FOOTER = """<footer>
  <div class="wrap">
   <a class="logo" href="/"><img src="/images/logo-dark.png" width="400" height="44" alt="David Park PhD"></a>
@@ -238,7 +238,7 @@ def episode_page(ep, nxt):
     nhref = ep_href(nxt) if nxt else None
     ntitle = f'<a href="{nhref}">{e(nxt["title"])}</a>' if nhref else e(nxt["title"])
     body = f""" <section class="pagehead">
-  <div class="crumb"><a href="/episodes/">Episodes</a> / Part {k}. {e(PARTS[k - 1][0])}</div>
+  <div class="crumb"><a href="/courses/">The Merit Test</a> / Part {k}. {e(PARTS[k - 1][0])}</div>
   <div class="kicker">Episode {ep["n"]}</div>
   <h1 class="ph1">{e(ep["title"])}</h1>
   <p class="lede">{e(ep["lede"])}</p>
@@ -302,6 +302,105 @@ def episodes_index():
     return page("episodes/index.html", "Episodes | David Park PhD", "All episodes of the Evidence-Based Entrepreneurship series from David Park PhD, with a free worksheet for each.", body, "Episodes")
 
 
+# Shows (WD-55, WD-59, WD-62, WD-63). Add a show here when it launches; "first" stays None until its first episode is out.
+SHOWS = [
+    dict(key="now", tag="NOW", name="Business Now", line="Business news, checked against the evidence.",
+         about="Layoffs, IPOs, a brand's collapse or comeback, the debate everyone is having. Each episode takes one story in the news, looks at what the research says, and ends with what it means for founders.",
+         formats=["Debates, 8 to 12 minutes, with both sides and a verdict", "Breakdowns, 5 to 8 minutes, one story and the lesson", "Now in 60, a one-minute take on a headline"], first=None),
+    dict(key="story", tag="STORY", name="Business Story", line="One company's story, and the research that explains it.",
+         about="Each episode tells one well-known company's story in about 10 to 15 minutes, then shows why it worked or failed with peer-reviewed research, and ends with a lesson founders can use.",
+         formats=["Episodes, 10 to 15 minutes", "A 60-second Short for each story"], first=None),
+]
+
+
+def show_cover(s):
+    return f"""<div class="scover"><div class="sl1">Business <span class="spill">{s["tag"]}</span></div><div class="sl2">with <img src="/images/logo-dark.png" width="400" height="44" alt="David Park PhD"></div></div>"""
+
+
+def merit_cover():
+    tiles = "".join('<b class="o">R</b>' if c == "R" else f"<b>{c}</b>" for c in "MERIT")
+    return f'<div class="mcover"><div class="the">THE</div><div class="mtiles">{tiles}</div><div class="the">TEST</div></div>'
+
+
+def shows_index():
+    blocks = []
+    for s in SHOWS:
+        fm = "".join(f"<li>{e(f)}</li>" for f in s["formats"])
+        status = (f'<a class="btn coral" href="{s["first"]}">Watch the first episode</a>' if s["first"]
+                  else '<p class="soon-note">The first episodes are coming soon. Sign up below to hear when they are out.</p>')
+        blocks.append(f""" <section class="tight show" id="{s["key"]}">
+  <div class="showrow">
+   {show_cover(s)}
+   <div>
+    <div class="kicker">Show</div>
+    <h2>{e(s["name"])} <span class="with">with David Park PhD</span></h2>
+    <p class="lede">{e(s["line"])}</p>
+    <p>{e(s["about"])}</p>
+    <ul class="formats">{fm}</ul>
+    {status}
+   </div>
+  </div>
+ </section>""")
+    body = """ <section class="pagehead">
+  <div class="kicker">Shows</div>
+  <h1 class="ph1">Shows</h1>
+  <p class="lede">Short shows on business, each one checked against the research.</p>
+ </section>
+""" + "\n".join(blocks)
+    return page("shows/index.html", "Shows | David Park PhD", "Business Now and Business Story with David Park PhD: business news and company stories, checked against the research.", body, "Shows")
+
+
+def courses_index():
+    parts = []
+    for i, (name, a, bb) in enumerate(PARTS, 1):
+        out = [x for x in EPISODES if a <= x["n"] <= bb and ep_href(x)]
+        status = ", ".join(f'<a href="{ep_href(x)}">Episode {x["n"]} {"is out" if x["youtube"] else "coming soon"}</a>' for x in out) or "Coming soon"
+        rng = f"Episodes {a} and {bb}" if bb == a + 1 else f"Episodes {a} to {bb}"
+        parts.append(f'<div class="part"><b>{i}</b><div><h3>{e(name)}</h3><small>{rng}. {status}</small></div></div>')
+    merit = "".join(f"<span><b>{l}</b>{w}</span>" for l, w in [("M", "Market"), ("E", "Edge"), ("R", "Returns"), ("I", "Implementation"), ("T", "Team")])
+    first = next((x for x in EPISODES if ep_href(x)), EPISODES[0])
+    body = f""" <section class="pagehead course-head">
+  {merit_cover()}
+  <div>
+   <div class="kicker">Free course · 20 episodes</div>
+   <h1 class="ph1">The Merit Test</h1>
+   <p class="lede">You have a business idea. Is it worth pursuing? Twenty short episodes, watched in order, each with a one-page worksheet for your own idea.</p>
+   <a class="btn coral" href="{ep_href(first)}">Start with episode 1</a>
+  </div>
+ </section>
+ <section class="tight">
+  <div class="cards">
+{chr(10).join(card(x) for x in EPISODES)}
+  </div>
+ </section>
+ <section>
+  <div class="topics">
+   <div class="tbox">
+    <h3>The five MERIT questions</h3>
+    <p>Five plain questions to ask about any business.</p>
+    <div class="merit">{merit}</div>
+   </div>
+   <div class="tbox">
+    <h3>The course in five parts</h3>
+    <p>From a first idea to the decision to go ahead.</p>
+    <div class="parts">{"".join(parts)}</div>
+   </div>
+  </div>
+ </section>"""
+    return page("courses/index.html", "The Merit Test | Free course | David Park PhD",
+                "The Merit Test, a free course from David Park PhD: 20 short episodes on whether a business idea is worth pursuing, with a free worksheet for each.", body, "Courses")
+
+
+def episodes_redirect():
+    """/episodes/ moved to /courses/ (WD-63). Episode pages keep their own addresses."""
+    (SITE / "episodes/index.html").write_text("""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>The Merit Test | David Park PhD</title>
+<meta http-equiv="refresh" content="0; url=/courses/"><link rel="canonical" href="https://www.davidparkphd.com/courses/">
+<meta name="robots" content="noindex"></head>
+<body><p>The episodes are now in <a href="/courses/">The Merit Test course</a>.</p></body></html>
+""")
+
+
 def resources_index():
     body = f""" <section class="pagehead">
   <div class="kicker">Free resources</div>
@@ -318,7 +417,7 @@ def resources_index():
    <p>A new worksheet comes with each episode, and short guides for hands-on steps will follow. New ones appear here first.</p>
   </div>
  </section>"""
-    return page("resources/index.html", "Resources | David Park PhD", "Free worksheets for the Evidence-Based Entrepreneurship series from David Park PhD.", body, "Resources")
+    return page("resources/index.html", "Resources | David Park PhD", "Free one-page worksheets for The Merit Test, the free course from David Park PhD.", body, "Resources")
 
 
 
@@ -331,7 +430,7 @@ def home_latest():
     if out:
         strip = f'<div class="strip">New episode. <a href="{ep_href(latest)}"><b>{e(latest["title"])}</b></a> Watch it now, with its free worksheet.</div>'
     else:
-        strip = '<div class="strip">New series. <b>Evidence-Based Entrepreneurship</b>. Episode 1 is coming soon, and its free worksheet is ready now.</div>'
+        strip = '<div class="strip">New free course. <b>The Merit Test</b>. Episode 1 is coming soon, and its free worksheet is ready now.</div>'
     return strip, "<!-- latest -->\n" + cards + "\n   <!-- /latest -->"
 
 
@@ -373,7 +472,7 @@ def signup_pages():
   <div class="kicker">Almost done</div>
   <h1 class="ph1">Check your inbox</h1>
   <p class="lede">An email is on its way to confirm your address. Click the button in it, and you're on the list.</p>
-  <p style="margin-top:28px"><a class="btn coral" href="/resources/">Get the free worksheets</a><a class="btn ghost" href="/episodes/">Browse the episodes</a></p>
+  <p style="margin-top:28px"><a class="btn coral" href="/resources/">Get the free worksheets</a><a class="btn ghost" href="/courses/">Start the free course</a></p>
  </section>"""
     urls = [page("privacy.html", "Privacy note | David Park PhD", "What happens to your email address when you sign up for David Park PhD emails.", privacy)]
     page("thanks.html", "Thanks for signing up | David Park PhD", "Check your inbox to confirm your sign-up.", thanks)
@@ -381,7 +480,8 @@ def signup_pages():
 
 
 def main():
-    urls = [BASE + "/", BASE + "/about.html", episodes_index(), resources_index()]
+    urls = [BASE + "/", BASE + "/about.html", shows_index(), courses_index(), resources_index()]
+    episodes_redirect()
     eps = [x for x in EPISODES]
     for i, ep in enumerate(eps):
         if ep_href(ep):
