@@ -357,3 +357,8 @@ footer a.logo{opacity:1}
 .course-hero.on-courses .hh{font-size:56px}
 @media (min-width:861px) and (max-width:1180px){.course-hero.on-courses .hh{font-size:46px}}
 @media (max-width:860px){.course-hero.on-courses .hh{font-size:36px}}
+.course-hero .hh em{white-space:nowrap}
+@media (max-width:560px){.course-hero .hh em{white-space:normal}.course-hero .hh br{display:none}}
+.course-hero .hh .nw{white-space:nowrap}
+@media (min-width:861px){.course-hero.on-courses{grid-template-columns:1.6fr 1fr}.course-hero.on-courses .hh{font-size:52px}}
+@media (max-width:560px){.course-hero .hh .nw{white-space:normal}}

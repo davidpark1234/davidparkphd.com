@@ -468,7 +468,7 @@ def course_hero(tag, where):
     return f""" <div class="hero grid course-hero on-{where}">
   <div class="copy">
    <div class="series">{label}</div>
-   <{tag} class="hh">Evidence-based tools for <em>starting a business.</em></{tag}>
+   <{tag} class="hh">Evidence-based tools<br> <span class="nw">for <em>starting a business.</em></span></{tag}>
    <p>Before you bet your savings or your career on a business idea, find out what has to be true for it to work. Short episodes built on research, and a free worksheet to test your own idea.</p>
    {soon}{btns}
   </div>
