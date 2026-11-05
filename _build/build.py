@@ -302,6 +302,10 @@ def episodes_index():
     return page("episodes/index.html", "Episodes | David Park PhD", "All episodes of the Evidence-Based Entrepreneurship series from David Park PhD, with a free worksheet for each.", body, "Episodes")
 
 
+# The Merit Test course stays "coming soon" until the whole series is uploaded (WD-61). Set to False on launch day:
+# the homepage banner, the course page and the homepage course row then show the episodes again.
+COURSE_SOON = True
+
 # Shows (WD-55, WD-59, WD-62, WD-63). Add a show here when it launches; "first" stays None until its first episode is out.
 SHOWS = [
     dict(key="now", tag="NOW", name="Business Now", line="Business news, checked against the evidence.",
@@ -354,7 +358,7 @@ def courses_index():
     parts = []
     for i, (name, a, bb) in enumerate(PARTS, 1):
         out = [x for x in EPISODES if a <= x["n"] <= bb and ep_href(x)]
-        status = ", ".join(f'<a href="{ep_href(x)}">Episode {x["n"]} {"is out" if x["youtube"] else "coming soon"}</a>' for x in out) or "Coming soon"
+        status = "Coming soon" if COURSE_SOON else (", ".join(f'<a href="{ep_href(x)}">Episode {x["n"]} {"is out" if x["youtube"] else "coming soon"}</a>' for x in out) or "Coming soon")
         rng = f"Episodes {a} and {bb}" if bb == a + 1 else f"Episodes {a} to {bb}"
         parts.append(f'<div class="part"><b>{i}</b><div><h3>{e(name)}</h3><small>{rng}. {status}</small></div></div>')
     merit = "".join(f"<span><b>{l}</b>{w}</span>" for l, w in [("M", "Market"), ("E", "Edge"), ("R", "Returns"), ("I", "Implementation"), ("T", "Team")])
@@ -362,17 +366,13 @@ def courses_index():
     body = f""" <section class="pagehead course-head">
   {merit_cover()}
   <div>
-   <div class="kicker">Free course · 20 episodes</div>
+   <div class="kicker">Free course · {"coming soon" if COURSE_SOON else "20 episodes"}</div>
    <h1 class="ph1">The Merit Test</h1>
    <p class="lede">You have a business idea. Is it worth pursuing? Twenty short episodes, watched in order, each with a one-page worksheet for your own idea.</p>
-   <a class="btn coral" href="{ep_href(first)}">Start with episode 1</a>
+   {'<p class="soon-note">The course is coming soon. Sign up below to hear when it starts.</p>' if COURSE_SOON else f'<a class="btn coral" href="{ep_href(first)}">Start with episode 1</a>'}
   </div>
  </section>
- <section class="tight">
-  <div class="cards">
-{chr(10).join(card(x) for x in EPISODES)}
-  </div>
- </section>
+ {"" if COURSE_SOON else chr(10).join([' <section class="tight">', '  <div class="cards">', chr(10).join(card(x) for x in EPISODES), '  </div>', ' </section>'])}
  <section>
   <div class="topics">
    <div class="tbox">
@@ -388,7 +388,7 @@ def courses_index():
   </div>
  </section>"""
     return page("courses/index.html", "The Merit Test | Free course | David Park PhD",
-                "The Merit Test, a free course from David Park PhD: 20 short episodes on whether a business idea is worth pursuing, with a free worksheet for each.", body, "Courses")
+                ("Coming soon. " if COURSE_SOON else "") + "The Merit Test, a free course from David Park PhD: 20 short episodes on whether a business idea is worth pursuing, with a free worksheet for each.", body, "Courses")
 
 
 def episodes_redirect():
@@ -423,6 +423,9 @@ def resources_index():
 
 def home_latest():
     """The homepage banner and its two episode cards: the newest episode that is out (or episode 1) and the one after it."""
+    if COURSE_SOON:
+        return ('<div class="strip">Coming soon. <b>The Merit Test</b>, a free course in 20 short episodes, each with a free worksheet.</div>',
+                "<!-- latest -->\n   <!-- /latest -->")
     out = [x for x in EPISODES if x["youtube"] and ep_href(x)]
     latest = out[-1] if out else EPISODES[0]
     i = EPISODES.index(latest)
