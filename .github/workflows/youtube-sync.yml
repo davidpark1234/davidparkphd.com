@@ -4,7 +4,7 @@
 name: YouTube to website
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "7,22,37,52 * * * *"   # off the top of the hour, where GitHub drops most scheduled runs
   workflow_dispatch:
 permissions:
   contents: write

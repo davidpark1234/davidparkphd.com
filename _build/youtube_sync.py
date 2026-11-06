@@ -72,6 +72,46 @@ def entries(xml_bytes):
     return out
 
 
+def page_ids(url):
+    """Video ids in the order a channel or playlist page lists them (used when YouTube's feeds are down)."""
+    raw = fetch(url, tries=2)
+    if not raw:
+        return None
+    html = raw.decode("utf8", "ignore")
+    return list(dict.fromkeys(re.findall(r'"videoId":"([\w-]{11})"', html)))
+
+
+def watch_details(vid):
+    """Title, publish date and description from a video's own page."""
+    raw = fetch(f"https://www.youtube.com/watch?v={vid}&hl=en", tries=2)
+    if not raw:
+        return None
+    html = raw.decode("utf8", "ignore")
+    def js(key):
+        m = re.search(r'"' + key + r'":"((?:[^"\\]|\\.)*)"', html)
+        return json.loads('"' + m.group(1) + '"') if m else ""
+    title = js("title") or ""
+    if not title:
+        return None
+    return dict(id=vid, title=title, published=(js("publishDate") or js("uploadDate"))[:10], description=js("shortDescription"))
+
+
+def channel_page_entries(known):
+    """Fallback for a dead feed: the channel's Videos tab lists full videos only (Shorts have their own tab)."""
+    ids = page_ids(f"https://www.youtube.com/channel/{CHANNEL_ID}/videos?hl=en")
+    if ids is None:
+        return None
+    out = []
+    for vid in ids[:15]:
+        if vid in known:
+            out.append(dict(id=vid, title=None, published="", description=None))   # already on the site: no page fetch needed
+            continue
+        d = watch_details(vid)
+        if d:
+            out.append(d)
+    return out
+
+
 def find_playlists(names):
     """Playlist ids by name, read from the channel's playlists page (best effort; a playlist id set by hand always wins)."""
     page = fetch(f"https://www.youtube.com/channel/{CHANNEL_ID}/playlists?hl=en", tries=1)
@@ -107,12 +147,17 @@ def main():
     ids = json.loads(IDS.read_text()) if IDS.exists() else {}
     store = json.loads(VIDEOS.read_text()) if VIDEOS.exists() else {}
     store.setdefault("items", []); store.setdefault("playlists", {}); store.setdefault("shorts", [])
-    raw = fetch(FEED)
-    if raw is None:
-        print("::warning::YouTube feed unavailable, will try again on the next run")
-        return
-    feed = entries(raw)
     known = set(ids.values()) | {v["id"] for v in store["items"]} | set(store["shorts"])
+    raw = fetch(FEED)
+    from_page = raw is None
+    if from_page:
+        print("YouTube feed unavailable, reading the channel's Videos page instead")
+        feed = channel_page_entries(known)
+        if feed is None:
+            print("::warning::YouTube feed and channel page unavailable, will try again on the next run")
+            return
+    else:
+        feed = entries(raw)
     new = [v for v in feed if v["id"] and v["id"] not in known]
     show_list = shows()
     if new:
@@ -123,11 +168,14 @@ def main():
     members = {}
     for key, pid in store["playlists"].items():
         pl = fetch("https://www.youtube.com/feeds/videos.xml?playlist_id=" + pid, tries=1) if new else None
-        members[key] = {v["id"] for v in entries(pl)} if pl else set()
+        if pl:
+            members[key] = {v["id"] for v in entries(pl)}
+        else:
+            members[key] = set(page_ids("https://www.youtube.com/playlist?list=" + pid + "&hl=en") or []) if new else set()
     open_eps = [(n, t) for n, t in episodes() if str(n) not in ids]
     changed = []
     for v in new:
-        if is_short(v["id"]):
+        if not from_page and is_short(v["id"]):
             print(f"skip Short {v['id']} {v['title']!r}"); store["shorts"] = (store["shorts"] + [v["id"]])[-300:]; changed.append("short")
             continue
         best = max(open_eps, key=lambda x: difflib.SequenceMatcher(None, norm(x[1]), norm(v["title"])).ratio(), default=None)
@@ -148,12 +196,15 @@ def main():
     by_id = {v["id"]: v for v in feed}
     for it in store["items"]:                      # keep each page in step with its YouTube description and title
         f = by_id.get(it["id"])
-        if f and (it.get("description") != f["description"] or it["title"] != f["title"]):
+        if f and f.get("title") and (it.get("description") != f["description"] or it["title"] != f["title"]):
             it["description"], it["title"] = f["description"], f["title"]; changed.append("updated " + it["id"])
         it.setdefault("slug", slugify(it["title"]))  # the address stays the same even if the title changes later
     if changed and not dry:
         IDS.write_text(json.dumps(dict(sorted(ids.items(), key=lambda x: int(x[0]))), indent=1) + "\n")
-        store["items"].sort(key=lambda x: x["published"], reverse=True)
+        # newest first; on the same day the one added later (uploaded later) comes first
+        order = {id(v): i for i, v in enumerate(store["items"])}
+        new_ids = [v["id"] for v in new]
+        store["items"].sort(key=lambda x: (x["published"], -new_ids.index(x["id"]) if x["id"] in new_ids else -99, order[id(x)]), reverse=True)
         VIDEOS.write_text(json.dumps(store, indent=1, ensure_ascii=False) + "\n")
     print(f"{len(feed)} videos in the feed, new: {changed or 'none'}{' (dry run)' if dry else ''}")
 
